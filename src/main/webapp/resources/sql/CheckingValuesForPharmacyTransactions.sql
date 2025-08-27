@@ -9,7 +9,7 @@ select `ID`,  `CREATEDAT`,  `LINENETRATE`, `LINEGROSSTOTAL`, `GROSSRATE`, `GROSS
 
 -- Check the latest pharmaceutical bill item data
 -- This query verifies pharmacy-specific item information including rates and stock references
-select `ID`, `QTY`, `RETAILRATE`, `PURCHASERATE`, `COSTRATE` ,  `PURCHASERATEPACK`, `RETAILRATEPACK`, `COSTRATEPACK`, `PURCHASEVALUE`, `RETAILVALUE`, `COSTVALUE`,  `STOCK_ID`, `ITEMBATCH_ID` from pharmaceuticalbillitem order by id desc limit 10;
+select `CREATEDAT`, `CREATER_ID`, `ID`, `QTY`, `RETAILRATE`, `PURCHASERATE`, `COSTRATE` ,  `PURCHASERATEPACK`, `RETAILRATEPACK`, `COSTRATEPACK`, `PURCHASEVALUE`, `RETAILVALUE`, `COSTVALUE` from pharmaceuticalbillitem order by id desc limit 10;
 
 -- Check the latest bill header information
 -- This query retrieves the most recent bill with key totals and transaction type

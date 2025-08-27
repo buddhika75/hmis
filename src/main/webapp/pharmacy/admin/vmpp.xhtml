@@ -10,7 +10,7 @@
     <ui:define name="subcontent">
         <h:form>
             <p:growl id="msg"/>
-            <p:focus id="selectFocus" for="lstSelect" />
+            <p:focus id="selectFocus" for="acVmpp" />
             <p:focus id="detailFocus" for="gpDetail" />
             <p:panel header="Manage VMPPs"  >
                 <div class="row" >
@@ -33,7 +33,7 @@
                                     icon="fas fa-trash"
                                     ajax="false" 
                                     process="btnDelete"
-                                    update="gpDetail lstSelect"
+                                    update="gpDetail acVmpp"
                                     onclick="if (!confirm('Are you sure you want to delete this record?'))
                                                 return false;" 
                                     action="#{vmppController.delete()}"  
@@ -41,16 +41,18 @@
                                 </p:commandButton>
                             </h:panelGrid>
 
-                            <p:selectOneListbox
-                                class="w-100" 
-                                filter="true"
-                                filterMatchMode="contains"
-                                id="lstSelect" 
+                            <p:autoComplete
+                                id="acVmpp"
+                                class="w-100"
+                                inputStyleClass="w-100"
                                 value="#{vmppController.current}"
-                                >
-                                <f:selectItems value="#{vmppController.items}" var="vmpp" itemLabel="#{vmpp.name}" itemValue="#{vmpp}" ></f:selectItems>
-                                <p:ajax process="lstSelect" update="gpDetail" ></p:ajax>
-                            </p:selectOneListbox>
+                                forceSelection="true"
+                                completeMethod="#{vmppController.completeVmpp}"
+                                var="i"
+                                itemLabel="#{i.name}"
+                                itemValue="#{i}">
+                                <p:ajax event="itemSelect" process="@this" update="gpDetail btnDelete"/>
+                            </p:autoComplete>
 
 
                         </p:panel>
@@ -128,7 +130,7 @@
                                 id="btnSave"
                                 value="Save"
                                 process="btnSave gridDetails" 
-                                update="lstSelect msg" 
+                                update="acVmpp msg"
                                 class="m-1 ui-button-warning w-25"
                                 icon="fas fa-save"
                                 action="#{vmppController.saveSelected()}"></p:commandButton>

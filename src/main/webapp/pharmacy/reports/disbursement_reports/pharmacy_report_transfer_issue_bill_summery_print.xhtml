@@ -45,14 +45,14 @@
                                     width: 297mm!important;
                                     zoom: 2.0;
                                 }
-                                
+
                                 table {
                                     border-collapse: collapse;
                                     width: 100%;
                                     font-size: 12px!important;
                                     margin-top: 1mm!important;
                                 }
-                                
+
                                 th, td {
                                     border: 1px solid #000;
                                     padding: 0px!important;
@@ -60,11 +60,11 @@
                                     text-align: left;
                                     margin-left: 10mm!important;
                                 }
-                                
+
                                 .header{
                                     font-size: 16px!important;
                                 }
-                                
+
                                 tfoot{
                                     font-weight: 700!important;
                                     font-size: 11px!important;
@@ -149,87 +149,107 @@
                                 <div>
                                     <table style="width: 100%; border-collapse: collapse;">
                                         <thead>
-                                        <tr>
-                                            <th style="font-weight: 700; text-align: center; padding: 4px;">
-                                                <h:outputText value="From Department" />
-                                            </th>
-                                            <th style="font-weight: 700; text-align: center; padding: 4px;">
-                                                <h:outputText value="To Department" />
-                                            </th>
-                                            <th style="font-weight: 700; text-align: center; padding: 4px;">
-                                                <h:outputText value="Purchase Value" />
-                                            </th>
-                                            <th style="font-weight: 700; text-align: center; padding: 4px;">
-                                                <h:outputText value="Cost Value" />
-                                            </th>
-                                            <th style="font-weight: 700; text-align: center; padding: 4px;">
-                                                <h:outputText value="Retail Value" />
-                                            </th>
-                                            <th style="font-weight: 700; text-align: center; padding: 4px;">
-                                                <h:outputText value="Transfer Value" />
-                                            </th>
-                                        </tr>
+                                            <tr>
+                                                <th style="font-weight: 700; text-align: center; padding: 4px;">
+                                                    <h:outputText value="From Department" />
+                                                </th>
+                                                <th style="font-weight: 700; text-align: center; padding: 4px;">
+                                                    <h:outputText value="To Department" />
+                                                </th>
+                                                <th style="font-weight: 700; text-align: center; padding: 4px;">
+                                                    <h:outputText value="Purchase Value" />
+                                                </th>
+                                                <h:panelGroup rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Disbursement Reports - Display Cost Value', true)}">
+                                                    <th style="font-weight: 700; text-align: center; padding: 4px;">
+                                                        <h:outputText value="Cost Value" />
+                                                    </th>
+                                                </h:panelGroup>
+
+                                                <th style="font-weight: 700; text-align: center; padding: 4px;">
+                                                    <h:outputText value="Retail Value" />
+                                                </th>
+                                                <h:panelGroup rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Disbursement Reports - Display Transfer Value', true)}">
+                                                    <th style="font-weight: 700; text-align: center; padding: 4px;" >
+                                                        <h:outputText value="Transfer Value" />
+                                                    </th>
+                                                </h:panelGroup>
+
+                                            </tr>
                                         </thead>
 
                                         <tbody>
-                                        <ui:repeat value="#{reportsTransfer.transferList}" var="i">
-                                            <tr>
-                                                <td style="font-weight: 500; text-align: left; padding: 4px;">
-                                                    <h:outputText value="#{i.fromDepartment}" />
-                                                </td>
-                                                <td style="font-weight: 500; text-align: left; padding: 4px;">
-                                                    <h:outputText value="#{i.toDepartment}" />
-                                                </td>
-                                                <td style="font-weight: 500; text-align: right; padding: 4px;">
-                                                    <h:outputLabel value="#{i.purchaseValue}">
-                                                        <f:convertNumber pattern="#,##0.00" />
-                                                    </h:outputLabel>
-                                                </td>
-                                                <td style="font-weight: 500; text-align: right; padding: 4px;">
-                                                    <h:outputLabel value="#{i.costValue}">
-                                                        <f:convertNumber pattern="#,##0.00" />
-                                                    </h:outputLabel>
-                                                </td>
-                                                <td style="font-weight: 500; text-align: right; padding: 4px;">
-                                                    <h:outputLabel value="#{i.retailValue}">
-                                                        <f:convertNumber pattern="#,##0.00" />
-                                                    </h:outputLabel>
-                                                </td>
-                                                <td style="font-weight: 500; text-align: right; padding: 4px;">
-                                                    <h:outputLabel value="#{i.transferValue}">
-                                                        <f:convertNumber pattern="#,##0.00" />
-                                                    </h:outputLabel>
-                                                </td>
-                                            </tr>
-                                        </ui:repeat>
+                                            <ui:repeat value="#{reportsTransfer.transferList}" var="i">
+                                                <tr>
+                                                    <td style="font-weight: 500; text-align: left; padding: 4px;">
+                                                        <h:outputText value="#{i.fromDepartment}" />
+                                                    </td>
+                                                    <td style="font-weight: 500; text-align: left; padding: 4px;">
+                                                        <h:outputText value="#{i.toDepartment}" />
+                                                    </td>
+                                                    <td style="font-weight: 500; text-align: right; padding: 4px;">
+                                                        <h:outputLabel value="#{i.purchaseValue}">
+                                                            <f:convertNumber pattern="#,##0.00" />
+                                                        </h:outputLabel>
+                                                    </td>
+                                                    <h:panelGroup rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Disbursement Reports - Display Cost Value', true)}">
+                                                        <td style="font-weight: 500; text-align: right; padding: 4px;">
+                                                            <h:outputLabel value="#{i.costValue}">
+                                                                <f:convertNumber pattern="#,##0.00" />
+                                                            </h:outputLabel>
+                                                        </td>
+                                                    </h:panelGroup>
+
+                                                    <td style="font-weight: 500; text-align: right; padding: 4px;">
+                                                        <h:outputLabel value="#{i.retailValue}">
+                                                            <f:convertNumber pattern="#,##0.00" />
+                                                        </h:outputLabel>
+                                                    </td>
+
+                                                    <h:panelGroup rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Disbursement Reports - Display Transfer Value', true)}">
+                                                        <td style="font-weight: 500; text-align: right; padding: 4px;">
+                                                            <h:outputLabel value="#{i.transferValue}">
+                                                                <f:convertNumber pattern="#,##0.00" />
+                                                            </h:outputLabel>
+                                                        </td>
+                                                    </h:panelGroup>
+
+                                                </tr>
+                                            </ui:repeat>
                                         </tbody>
 
                                         <tfoot>
-                                        <tr>
-                                            <td colspan="2" style="text-align: left; font-weight: 700;" >
-                                                <h:outputText value="TOTALS" />
-                                            </td>
-                                            <td style="text-align: right; font-weight: 700; padding: 4px;">
-                                                <h:outputLabel value="#{reportsTransfer.netTotalPurchaseValues}">
-                                                    <f:convertNumber pattern="#,##0.00" />
-                                                </h:outputLabel>
-                                            </td>
-                                            <td style="text-align: right; font-weight: 700; padding: 4px;">
-                                                <h:outputLabel value="#{reportsTransfer.netTotalCostValues}">
-                                                    <f:convertNumber pattern="#,##0.00" />
-                                                </h:outputLabel>
-                                            </td>
-                                            <td style="text-align: right; font-weight: 700; padding: 4px;">
-                                                <h:outputLabel value="#{reportsTransfer.netTotalSaleValues}">
-                                                    <f:convertNumber pattern="#,##0.00" />
-                                                </h:outputLabel>
-                                            </td>
-                                            <td style="text-align: right; font-weight: 700; padding: 4px;">
-                                                <h:outputLabel value="#{reportsTransfer.netTotalValues}">
-                                                    <f:convertNumber pattern="#,##0.00" />
-                                                </h:outputLabel>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <td colspan="2" style="text-align: left; font-weight: 700;" >
+                                                    <h:outputText value="TOTALS" />
+                                                </td>
+                                                <td style="text-align: right; font-weight: 700; padding: 4px;">
+                                                    <h:outputLabel value="#{reportsTransfer.netTotalPurchaseValues}">
+                                                        <f:convertNumber pattern="#,##0.00" />
+                                                    </h:outputLabel>
+                                                </td>
+                                                <h:panelGroup rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Disbursement Reports - Display Cost Value', true)}">
+                                                    <td style="text-align: right; font-weight: 700; padding: 4px;">
+                                                        <h:outputLabel value="#{reportsTransfer.netTotalCostValues}">
+                                                            <f:convertNumber pattern="#,##0.00" />
+                                                        </h:outputLabel>
+                                                    </td>
+                                                </h:panelGroup>
+
+                                                <td style="text-align: right; font-weight: 700; padding: 4px;">
+                                                    <h:outputLabel value="#{reportsTransfer.netTotalSaleValues}">
+                                                        <f:convertNumber pattern="#,##0.00" />
+                                                    </h:outputLabel>
+                                                </td>
+
+                                                <h:panelGroup rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Disbursement Reports - Display Transfer Value', true)}">
+                                                    <td style="text-align: right; font-weight: 700; padding: 4px;">
+                                                        <h:outputLabel value="#{reportsTransfer.netTotalValues}">
+                                                            <f:convertNumber pattern="#,##0.00" />
+                                                        </h:outputLabel>
+                                                    </td>
+                                                </h:panelGroup>
+
+                                            </tr>
                                         </tfoot>
                                     </table>
 

@@ -113,7 +113,6 @@
                                             </h:outputLabel>
                                             <br/>
                                             <h:panelGroup rendered="#{bill.cancelled}" >
-                                                <h:outputLabel style="color: red;" value="Cancelled at " />
                                                 <h:outputLabel style="color: red;" rendered="#{bill.cancelled}" value="#{bill.cancelledBill.createdAt}" >
                                                     <f:convertDateTime  timeZone="Asia/Colombo" pattern="#{sessionController.applicationPreference.longDateTimeFormat}" />
                                                 </h:outputLabel>
@@ -124,7 +123,6 @@
                                             <h:outputLabel value="#{bill.creater.webUserPerson.name}" ></h:outputLabel>
                                             <br/>
                                             <h:panelGroup rendered="#{bill.cancelled}" >
-                                                <h:outputLabel style="color: red;" value="Cancelled at " />
                                                 <h:outputLabel style="color: red;" rendered="#{bill.cancelled}" value="#{bill.cancelledBill.creater.webUserPerson.name}" >                                       
                                                 </h:outputLabel>
                                             </h:panelGroup>                               
@@ -137,6 +135,10 @@
                                         <p:column headerText="CC Name">
                                             <h:outputLabel value="#{bill.toInstitution.name}" ></h:outputLabel>
                                         </p:column>  
+                                        
+                                        <p:column headerText="Status" width="10em">
+                                            <p:badge value="Cancelled" styleClass="ui-badge-danger" rendered="#{bill.cancelled}" />
+                                        </p:column>
 
                                         <p:column headerText="Net Value" width="8em" style="text-align: end;">
                                             <h:outputLabel value="#{bill.netTotal}" >

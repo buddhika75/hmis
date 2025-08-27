@@ -10,7 +10,7 @@
             <ui:define name="subcontent">
                 <h:form id="form"  >
                     <p:growl id="msg"/>
-                    <p:focus id="selectFocus" for="lstSelect" />
+                    <p:focus id="selectFocus" for="acVtm" />
                     <p:focus id="detailFocus" for="gpDetail" />
 
                     <p:panel header="Manage VTMs" styleClass="w-100 mb-2" rendered="false" />
@@ -23,7 +23,7 @@
                                 icon="fa fa-plus"
                                 action="#{vtmController.prepareAdd()}"
                                 class=" m-1 ui-button-success w-25"
-                                update="lstSelect gpDetail btnEdit btnDelete"
+                                update="acVtm gpDetail btnEdit btnDelete"
                                 process="btnAdd"
                                 disabled="#{vtmController.editable}">
                             </p:commandButton>
@@ -33,7 +33,7 @@
                                 icon="fas fa-edit"
                                 action="#{vtmController.edit()}"
                                 class=" m-1 ui-button-info w-25"
-                                update="lstSelect gpDetail btnAdd btnDelete"
+                                update="acVtm gpDetail btnAdd btnDelete"
                                 process="btnEdit"
                                 disabled="#{vtmController.editable or vtmController.current.id eq null}">
                             </p:commandButton>
@@ -45,28 +45,26 @@
                                 value="Delete"
                                 icon="fas fa-trash"
                                 class=" m-1 ui-button-danger w-25"
-                                update="lstSelect gpDetail msg"
+                                update="acVtm gpDetail msg"
                                 process="btnDelete"
                                 disabled="#{vtmController.editable}">
                             </p:commandButton>
-                            <p:selectOneListbox
+                            <p:autoComplete
                                 class="w-100"
-                                id="lstSelect"
+                                id="acVtm"
                                 value="#{vtmController.current}"
-                                filter="true"
+                                completeMethod="#{vtmController.completeVtm}"
+                                var="i"
+                                itemLabel="#{i.name}"
+                                itemValue="#{i}"
+                                forceSelection="true"
                                 disabled="#{vtmController.editable}">
-                                <f:selectItems
-                                    value="#{vtmController.items}"
-                                    var="myItem"
-                                    itemValue="#{myItem}"
-                                    itemLabel="#{myItem.name}" ></f:selectItems>
-                                <p:ajax event="change"   update="gpDetail" process="lstSelect" >
-                                </p:ajax>
-                            </p:selectOneListbox>
+                                <p:ajax event="itemSelect" process="@this" update="gpDetail btnEdit btnDelete" />
+                            </p:autoComplete>
 
 
                             <p:focus id="focusItem" for="txtName" ></p:focus>
-                            <p:focus id="focusSelect" for="lstSelect" ></p:focus>
+                            <p:focus id="focusSelect" for="acVtm" ></p:focus>
 
                         </div>
                         <div class="col-md-7">
@@ -128,7 +126,7 @@
                                                 action="#{vtmController.save}"
                                                 class=" m-1 ui-button-warning w-25"
                                                 process="btnSave gpDetail"
-                                                update="lstSelect gpDetail msg btnEdit btnDelete btnAdd"
+                                                update="acVtm gpDetail msg btnEdit btnDelete btnAdd"
                                                 disabled="#{!vtmController.editable}" />
                                             <p:commandButton
                                                 id="btnCancel"
@@ -137,7 +135,7 @@
                                                 action="#{vtmController.cancel()}"
                                                 class=" m-1 ui-button-secondary w-25"
                                                 process="btnCancel"
-                                                update="lstSelect gpDetail btnEdit btnDelete btnAdd"
+                                                update="acVtm gpDetail btnEdit btnDelete btnAdd"
                                                 disabled="#{!vtmController.editable}" />
                                         </div>
                                     </h:panelGroup>

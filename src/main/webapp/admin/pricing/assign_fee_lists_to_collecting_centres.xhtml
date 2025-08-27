@@ -1,0 +1,245 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:head>
+    </h:head>
+    <h:body>
+
+        <ui:composition template="/admin/pricing/index.xhtml">
+
+            <ui:define name="subcontent">
+
+                <h:form>
+                    <p:growl id="msg"/>
+                    <p:panel>
+                        <f:facet name="header">
+                            <h:outputText styleClass="fa fa-fw fa-list"></h:outputText>
+                            <p:outputLabel class="m-2">Assign Fee Lists to Collecting Centres</p:outputLabel>
+                        </f:facet>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <p:panel styleClass="mb-3">
+                                    <h:outputText value="This page allows you to assign fee lists to multiple collecting centres at once." 
+                                                  style="color: blue; font-weight: bold; font-size: 16px;"/>
+                                    <br/><br/>
+                                    <h:outputText value="You can filter, sort, and select multiple collecting centres, then assign a specific fee list to all selected centres." 
+                                                  style="color: black; font-weight: normal;"/>
+                                </p:panel>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <p:panel header="Load and Configure Fee List Assignment" styleClass="mb-3">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p:commandButton 
+                                                value="Load All Collecting Centres" 
+                                                action="#{itemFeeManager.loadCollectingCentresForFeeAssignment()}"
+                                                process="@this"
+                                                update="msg ccTable totalPanel assignmentPanel"
+                                                class="ui-button-info mb-3"
+                                                icon="fa fa-search">
+                                            </p:commandButton>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p:commandButton value="Download" ajax="false" class="ui-button-secondary">
+                                                <p:dataExporter type="xlsx" fileName="Collecting Centres Fee List Assignment" target="ccTable" />
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+
+                                    <h:panelGroup id="totalPanel">
+                                        <h:panelGroup rendered="#{itemFeeManager.collectingCentresForFeeAssignment ne null}">
+                                            <div class="row mb-3">
+                                                <div class="col-md-12">
+                                                    <p:panel styleClass="ui-panel-content-no-border">
+                                                        <h:outputText value="Total Collecting Centres: " 
+                                                                      style="font-weight: bold; font-size: 18px;"/>
+                                                        <h:outputText value="#{itemFeeManager.collectingCentresForFeeAssignment.size()}" 
+                                                                      style="font-weight: bold; font-size: 22px; color: blue;"/>
+                                                        <h:outputText value=" | Without Fee List: " 
+                                                                      style="font-weight: bold; font-size: 16px; margin-left: 20px;"/>
+                                                        <h:outputText value="#{itemFeeManager.countCentresWithoutFeeList()}" 
+                                                                      style="font-weight: bold; font-size: 18px; color: red;"/>
+                                                    </p:panel>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup id="assignmentPanel">
+                                        <h:panelGroup rendered="#{itemFeeManager.collectingCentresForFeeAssignment ne null and not empty itemFeeManager.collectingCentresForFeeAssignment}">
+                                            <div class="row mb-3">
+                                                <div class="col-md-4">
+                                                    <p:outputLabel value="Select Fee List to Assign:" for="feeListSelect"/>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <p:selectOneMenu 
+                                                        value="#{itemFeeManager.selectedFeeListForAssignment}" 
+                                                        id="feeListSelect" 
+                                                        filter="true"
+                                                        class="w-100"
+                                                        filterMatchMode="contains">
+                                                        <f:selectItem itemLabel="Select Fee List" />
+                                                        <f:selectItems 
+                                                            value="#{categoryController.feeListTypes}"
+                                                            var="feeList" 
+                                                            itemLabel="#{feeList.name}" 
+                                                            itemValue="#{feeList}" />
+                                                    </p:selectOneMenu>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-12">
+                                                    <p:commandButton 
+                                                        value="Assign Fee List to Selected Centres" 
+                                                        action="#{itemFeeManager.assignFeeListToSelectedCentres()}"
+                                                        process="@this feeListSelect"
+                                                        update="msg ccTable totalPanel"
+                                                        class="ui-button-success"
+                                                        icon="fa fa-check"
+                                                        onclick="return confirm('Are you sure you want to assign the selected fee list to all selected collecting centres?');">
+                                                    </p:commandButton>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputText value="DEBUG: List is null: #{itemFeeManager.collectingCentresForFeeAssignment eq null}" style="color: red; display: block;"/>
+                                        <h:outputText value="DEBUG: List size: #{itemFeeManager.collectingCentresForFeeAssignment.size()}" style="color: red; display: block;" rendered="#{itemFeeManager.collectingCentresForFeeAssignment ne null}"/>
+                                        
+                                        <p:dataTable value="#{itemFeeManager.collectingCentresForFeeAssignment}" 
+                                                     var="ccDto" 
+                                                     paginator="true" 
+                                                     rows="15"
+                                                     id="ccTable"
+                                                     styleClass="table-responsive"
+                                                     filteredValue="#{itemFeeManager.filteredCollectingCentres}"
+                                                     globalFilter="#{itemFeeManager.globalFilterValue}"
+                                                     emptyMessage="No collecting centres found"
+                                                     selection="#{itemFeeManager.selectedCollectingCentres}"
+                                                     rowKey="#{ccDto.institutionId}"
+                                                     selectionMode="multiple">
+
+                                            <f:facet name="header">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span>Collecting Centres Fee List Assignment</span>
+                                                    <p:inputText placeholder="Global Search..." 
+                                                                 value="#{itemFeeManager.globalFilterValue}"
+                                                                 class="w-25">
+                                                        <p:ajax update="ccTable" event="keyup"/>
+                                                    </p:inputText>
+                                                </div>
+                                            </f:facet>
+
+                                            <p:column selectionMode="multiple" headerText="Select" style="width:16px;text-align:center"/>
+
+                                            <p:column headerText="Centre Code" sortBy="#{ccDto.institutionCode}" filterBy="#{ccDto.institutionCode}">
+                                                <h:outputText value="#{ccDto.institutionCode}"/>
+                                            </p:column>
+
+                                            <p:column headerText="Centre Name" sortBy="#{ccDto.institutionName}" filterBy="#{ccDto.institutionName}">
+                                                <h:outputText value="#{ccDto.institutionName}"/>
+                                            </p:column>
+
+                                            <p:column headerText="Current Fee List" sortBy="#{ccDto.feeListDisplay}" filterBy="#{ccDto.feeListDisplay}">
+                                                <h:outputText value="#{ccDto.feeListDisplay}" 
+                                                              style="font-weight: bold; color: #{ccDto.currentFeeListType eq null ? 'red' : 'green'};"/>
+                                            </p:column>
+
+                                            <p:column headerText="Status">
+                                                <h:panelGroup rendered="#{ccDto.currentFeeListType eq null}">
+                                                    <span class="badge badge-danger">No Fee List</span>
+                                                </h:panelGroup>
+                                                <h:panelGroup rendered="#{ccDto.currentFeeListType ne null}">
+                                                    <span class="badge badge-success">Has Fee List</span>
+                                                </h:panelGroup>
+                                            </p:column>
+
+                                        </p:dataTable>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup rendered="#{itemFeeManager.collectingCentresForFeeAssignment eq null}">
+                                        <p:panel styleClass="ui-panel-content-no-border">
+                                            <h:outputText value="Click 'Load All Collecting Centres' to see available centres for fee list assignment" 
+                                                          style="font-style: italic; color: gray; font-size: 16px;"/>
+                                        </p:panel>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup rendered="#{itemFeeManager.collectingCentresForFeeAssignment ne null and empty itemFeeManager.collectingCentresForFeeAssignment}">
+                                        <p:panel styleClass="ui-panel-content-no-border">
+                                            <h:outputText value="No collecting centres found in the system" 
+                                                          style="color: orange; font-size: 18px; font-weight: bold;"/>
+                                        </p:panel>
+                                    </h:panelGroup>
+                                </p:panel>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p:button 
+                                    value="Back to Collecting Centre Fees" 
+                                    outcome="/admin/pricing/manage_collecting_centre_item_fees?faces-redirect=true"
+                                    class="w-100 ui-button-secondary"
+                                    icon="fa fa-arrow-left">
+                                </p:button>
+                            </div>
+                        </div>
+
+                        <br/>
+
+                        <p:panel header="Related Operations" styleClass="mt-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <p:button 
+                                        value="Individual CC Item Fees" 
+                                        outcome="/admin/pricing/manage_collecting_centre_item_fees?faces-redirect=true"
+                                        class="w-100 ui-button-info"
+                                        icon="fa fa-edit">
+                                    </p:button>
+                                </div>
+                                <div class="col-md-3">
+                                    <p:button 
+                                        value="Retire All CC Fees" 
+                                        outcome="/admin/pricing/retire_all_collecting_centre_item_fees?faces-redirect=true"
+                                        class="w-100 ui-button-danger"
+                                        icon="fa fa-times-circle">
+                                    </p:button>
+                                </div>
+                                <div class="col-md-3">
+                                    <p:button 
+                                        value="CC Price List Upload" 
+                                        outcome="/admin/pricing/collecting_centre_price_list_upload?faces-redirect=true"
+                                        class="w-100 ui-button-info"
+                                        icon="fa fa-upload">
+                                    </p:button>
+                                </div>
+                                <div class="col-md-3">
+                                    <p:button 
+                                        value="Download CC Item Fees" 
+                                        outcome="/admin/pricing/download_item_fees_for_collecting_centres?faces-redirect=true"
+                                        class="w-100 ui-button-info"
+                                        icon="fa fa-download">
+                                    </p:button>
+                                </div>
+                            </div>
+                        </p:panel>
+
+                    </p:panel>
+
+                </h:form>
+            </ui:define>
+
+        </ui:composition>
+
+    </h:body>
+</html>

@@ -74,7 +74,7 @@
                                             <p:inputText
                                                 autocomplete="off"
                                                 id="qty"
-                                                value="#{bi.pharmaceuticalBillItem.qty}" 
+                                                value="#{bi.billItemFinanceDetails.quantity}" 
                                                 class="w-100 text-end"
                                                 label="Qty" onfocus="this.select()">
                                                 <f:convertNumber pattern="#,#00"/>
@@ -89,7 +89,7 @@
                                             <p:inputText 
                                                 autocomplete="off"
                                                 id="freeQty" 
-                                                value="#{bi.pharmaceuticalBillItem.freeQty}" 
+                                                value="#{bi.billItemFinanceDetails.freeQuantity}" 
                                                 class="w-100 text-end"
                                                 onfocus="this.select()">
                                                 <f:convertNumber pattern="#,#00"/>
@@ -106,7 +106,7 @@
                                                 class="w-100 text-end"
                                                 style="margin: 0px;"
                                                 autocomplete="off"
-                                                value="#{bi.pharmaceuticalBillItem.purchaseRate}" onfocus="this.select()">   
+                                                value="#{bi.billItemFinanceDetails.lineGrossRate}" onfocus="this.select()">   
                                                 <f:convertNumber pattern="#00.00"/>
                                                 <f:ajax event="blur" render="total :#{p:resolveFirstComponentWithId('tot',view).clientId}"  execute="@this" listener="#{purchaseOrderController.onEdit(bi)}" ></f:ajax>
                                                 <f:ajax event="focus" render=":#{p:resolveFirstComponentWithId('tab',view).clientId}" listener="#{purchaseOrderController.onFocus(bi)}" />
@@ -127,7 +127,7 @@
 
 
                                         <p:column headerText="Total" width="6em"  class="text-end px-1"  >  
-                                            <h:outputText id="total" value="#{bi.pharmaceuticalBillItem.purchaseRate*bi.pharmaceuticalBillItem.qty}" >
+                                            <h:outputText id="total" value="#{bi.billItemFinanceDetails.lineGrossTotal}" >
                                                 <f:convertNumber pattern="#,##0.00"/>
                                             </h:outputText>
                                         </p:column>  

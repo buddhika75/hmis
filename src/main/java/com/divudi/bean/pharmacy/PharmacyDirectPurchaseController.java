@@ -777,8 +777,27 @@ public class PharmacyDirectPurchaseController implements Serializable {
     }
 
     public void billDiscountChangedByUser() {
+        ensureBillDiscountAndTaxSynchronization();
         pharmacyCostingService.distributeProportionalBillValuesToItems(getBillItems(), getBill());
-        calculateBillTotalsFromItems();
+    }
+    
+    /**
+     * Ensures that both bill.discount/tax and bill.billFinanceDetails.billDiscount/billTaxValue are synchronized
+     * The service method reads from billFinanceDetails, but UI may store in bill directly
+     */
+    private void ensureBillDiscountAndTaxSynchronization() {
+        if (getBill() == null) {
+            return;
+        }
+        
+        // Ensure BillFinanceDetails exists
+        if (getBill().getBillFinanceDetails() == null) {
+            getBill().setBillFinanceDetails(new BillFinanceDetails(getBill()));
+        }
+        
+        // Synchronize discount and tax from bill to billFinanceDetails
+        getBill().getBillFinanceDetails().setBillDiscount(BigDecimal.valueOf(getBill().getDiscount()));
+        getBill().getBillFinanceDetails().setBillTaxValue(BigDecimal.valueOf(getBill().getTax()));
     }
 
     public void addExpense() {

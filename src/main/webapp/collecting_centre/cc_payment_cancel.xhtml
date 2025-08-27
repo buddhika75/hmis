@@ -1,0 +1,151 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:bi="http://xmlns.jcp.org/jsf/composite/bill">
+
+    <h:body>
+        <ui:composition template="/collecting_centre/index.xhtml">
+            <ui:define name="subcontent">
+                <h:form>
+                    <h:panelGroup rendered="#{!collectingCentrePaymentController.printPriview}" styleClass="alignTop">
+                        <p:panel>
+                            <f:facet name="header">
+                                <div class="d-flex justify-content-between">
+                                    <h:outputText value="CC Payment Bill Cancellation" class="mt-2"/>
+                                    <div class="d-flex gap-3">
+
+                                        <p:inputText
+                                            style="width: 500px;"
+                                            placeholder="Select or enter a comment"
+                                            value="#{collectingCentrePaymentController.comment}" >
+                                        </p:inputText>
+
+
+                                        <p:commandButton 
+                                            ajax="false"
+                                            value="Cancel Payment Bill" 
+                                            icon="fa fa-cancel"
+                                            style="float: right"
+                                            class="ui-button-danger" 
+                                            action="#{collectingCentrePaymentController.cancelPaymentBill()}">
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+
+                            </f:facet>
+
+                            <div class="row">
+                                <div class="col-4">
+                                    <p:panel>
+                                        <f:facet name="header">
+                                            <h:outputText styleClass="fas fa-id-card-alt"></h:outputText>
+                                            <h:outputLabel value="Collecting Centre Details" class="mx-2"></h:outputLabel>
+                                        </f:facet>
+
+                                        <p:panelGrid columns="2">
+                                            <h:outputLabel value="Centre Code :" ></h:outputLabel>
+                                            <h:outputLabel value="#{collectingCentrePaymentController.currentPaymentBill.toInstitution.code}" ></h:outputLabel>
+                                            <h:outputLabel value="Centre Name :" ></h:outputLabel>
+                                            <h:outputLabel value="#{collectingCentrePaymentController.currentPaymentBill.toInstitution.name}" ></h:outputLabel>
+                                            <h:outputLabel value="Centre Route :" ></h:outputLabel>
+                                            <h:outputLabel value="#{collectingCentrePaymentController.currentPaymentBill.toInstitution.route.name}" ></h:outputLabel>
+                                        </p:panelGrid>
+
+                                    </p:panel>
+                                    <p:panel class="mt-2">
+                                        <f:facet name="header">
+                                            <h:outputText styleClass="fas fa-list-alt"></h:outputText>
+                                            <h:outputLabel value="Bill Detail" class="mx-2"></h:outputLabel>
+                                        </f:facet>
+                                        <p:panelGrid columns="2">
+                                            <h:outputLabel value="Bill No :" ></h:outputLabel>
+                                            <h:outputLabel value="#{collectingCentrePaymentController.currentPaymentBill.deptId}" ></h:outputLabel>
+                                            <h:outputLabel value="Bill Type Atomic :" ></h:outputLabel>
+                                            <h:outputLabel value="#{collectingCentrePaymentController.currentPaymentBill.billTypeAtomic}" ></h:outputLabel>
+                                            <h:outputLabel value="Payment Type :" ></h:outputLabel>
+                                            <h:outputLabel value="#{collectingCentrePaymentController.currentPaymentBill.paymentMethod}" ></h:outputLabel>
+                                            <h:outputLabel value="Net Total :" ></h:outputLabel>
+                                            <h:outputLabel value="#{collectingCentrePaymentController.currentPaymentBill.netTotal}" >
+                                                <f:convertNumber pattern="#,##0.00" ></f:convertNumber>
+                                            </h:outputLabel>
+                                        </p:panelGrid>
+                                    </p:panel>
+                                </div>
+                                <div class="col-8">
+                                    <p:panel>
+                                        <f:facet name="header">
+                                            <h:outputText styleClass="fas fa-list-alt"></h:outputText>
+                                            <h:outputLabel value="Payment Bills Details" class="mx-2"></h:outputLabel>
+                                        </f:facet>
+                                        <p:dataTable 
+                                            rowIndexVar="i" 
+                                            value="#{collectingCentrePaymentController.currentPaymentBill.billItems}" 
+                                            var="bill">
+                                            <p:column headerText="#" width="35">
+                                                <p:outputLabel value="#{i+1}"/>
+                                            </p:column>
+
+                                            <p:column>
+                                                <f:facet name="header">Bill No</f:facet>
+                                                <h:outputLabel value="#{bill.referenceBill.deptId}"/>
+                                            </p:column>
+                                            <p:column>
+                                                <f:facet name="header">Ref. Number</f:facet>
+                                                <h:outputLabel value="#{bill.referenceBill.referenceNumber}"/>
+                                            </p:column>
+                                            <p:column>
+                                                <f:facet name="header">Patient</f:facet>
+                                                <h:outputLabel value="#{bill.referenceBill.patient.person.nameWithTitle}"/>
+                                            </p:column>
+                                            <p:column>
+                                                <f:facet name="header">Net Total</f:facet>
+                                                <h:outputLabel 
+                                                    value="#{bill.netValue}" 
+                                                    style="text-align: right!important;">
+                                                    <f:convertNumber pattern="#,##0.00" />
+                                                </h:outputLabel>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </p:panel>
+                                </div>
+                            </div>
+
+
+                        </p:panel>
+                    </h:panelGroup>
+
+                    <!-- Print Preview Panel -->
+                    <h:panelGroup rendered="#{collectingCentrePaymentController.printPriview}" >
+                        <p:panel>
+                            <f:facet name="header">
+                                <div class="d-flex justify-content-between">
+                                    <h:outputText value="CC Payment Bill Cancellation" class="mt-2"/>
+                                    <div class="d-flex gap-3">
+
+                                        <p:commandButton 
+                                            ajax="false"
+                                            value="Back to Search Bill" 
+                                            icon="fas fa-arrow-left" 
+                                            style="float: right"
+                                            class="ui-button-warning" 
+                                            action="/collecting_centre/collecting_centre_repayment_bill_search?faces-redirect=true">
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+
+                            </f:facet>
+                            
+                            <h:panelGroup id="groupPrint" >
+                                <bi:A4PaperCCRepayment controller="#{collectingCentrePaymentController}" bill="#{collectingCentrePaymentController.currentPaymentBill}" dup="true"/>
+                            </h:panelGroup>
+                        </p:panel>
+                    </h:panelGroup>
+                </h:form>                
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>

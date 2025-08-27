@@ -134,6 +134,8 @@ public class PharmacyBillSearch implements Serializable {
     PharmacyRequestForBhtController pharmacyRequestForBhtController;
     @Inject
     PharmacyCalculation pharmacyCalculation;
+    @Inject
+    GrnCostingController grnCostingController;
     // </editor-fold>
     // <editor-fold defaultstate="collapsed" desc="Class Variables">
     private UploadedFile file;
@@ -221,8 +223,8 @@ public class PharmacyBillSearch implements Serializable {
     }
 
     /**
-     * @deprecated Use {@link #navigateToViewPharmacyTransferRequestById()} which
-     * works with DTO driven tables by accepting only the bill id.
+     * @deprecated Use {@link #navigateToViewPharmacyTransferRequestById()}
+     * which works with DTO driven tables by accepting only the bill id.
      */
     @Deprecated
     public String navigateToViewPharmacyTransferReqest() {
@@ -314,13 +316,13 @@ public class PharmacyBillSearch implements Serializable {
         bill = tb;
         return "/pharmacy/pharmacy_reprint_transfer_isssue?faces-redirect=true";
     }
-    
+
     public String navigateToReprintInpatientIssueForRequestsById() {
         if (billId == null) {
             JsfUtil.addErrorMessage("No Bill Selected");
             return null;
         }
-        Bill tb= billService.reloadBill(billId);
+        Bill tb = billService.reloadBill(billId);
         if (tb == null) {
             JsfUtil.addErrorMessage("Bill not found");
             return null;
@@ -347,8 +349,9 @@ public class PharmacyBillSearch implements Serializable {
     }
 
     /**
-     * Used by DTO reports where the bill id is passed as a parameter.
-     * This avoids potential ViewExpiredException issues with f:setPropertyActionListener.
+     * Used by DTO reports where the bill id is passed as a parameter. This
+     * avoids potential ViewExpiredException issues with
+     * f:setPropertyActionListener.
      */
     public String navigateToReprintPharmacyTransferIssueByIdWithParam(Long paramBillId) {
         if (paramBillId == null) {
@@ -1037,6 +1040,54 @@ public class PharmacyBillSearch implements Serializable {
         }
         return "/pharmacy/pharmacy_reprint_grn?faces-redirect=true";
     }
+
+    public String navigateToEditSavedGrn() {
+        if (bill == null) {
+            JsfUtil.addErrorMessage("No Bill Selected");
+            return null;
+        }
+        if (bill.getBillTypeAtomic() != BillTypeAtomic.PHARMACY_GRN_PRE) {
+            JsfUtil.addErrorMessage("Selected bill is not a saved GRN (PRE).");
+            return null;
+        }
+        grnController.setCurrentGrnBillPre(bill);
+        return grnController.navigateToEditGrn();
+    }
+
+    public String navigateToEditSavedGrnCosting() {
+        if (bill == null) {
+            JsfUtil.addErrorMessage("No Bill Selected");
+            return null;
+        }
+        if (bill.getBillTypeAtomic() != BillTypeAtomic.PHARMACY_GRN_PRE) {
+            JsfUtil.addErrorMessage("Selected bill is not a saved GRN (PRE).");
+            return null;
+        }
+        bill = billService.reloadBill(bill);
+        grnCostingController.setCurrentGrnBillPre(bill);
+        return grnCostingController.navigateToEditGrnCosting();
+    }
+
+//    public String navigateToApproveGrn() {
+//        if (bill == null) {
+//            JsfUtil.addErrorMessage("No Bill Selected");
+//            return null;
+//        }
+//        if (bill.getBillTypeAtomic() != BillTypeAtomic.PHARMACY_GRN_PRE) {
+//            JsfUtil.addErrorMessage("Invalid Bill Type");
+//            return null;
+//        }
+//        grnController.setCurrentGrnBillPre(bill);
+//        return grnController.navigateToApproveRecieveGrnPreBill();
+//    }
+
+//    public String navigateToViewCompletedGrn() {
+//        if (bill == null) {
+//            JsfUtil.addErrorMessage("No Bill Selected");
+//            return null;
+//        }
+//        return navigateToViewPharmacyGrn();
+//    }
 
     public String navigateToViewPurchaseOrder() {
         if (bill == null) {
@@ -2210,16 +2261,16 @@ public class PharmacyBillSearch implements Serializable {
 
     @Inject
     ConfigOptionApplicationController configOptionApplicationController;
-    
+
     private boolean cancellationStarted;
 
     public void pharmacyRetailCancelBillWithStock() throws ParseException {
-        if(cancellationStarted){
+        if (cancellationStarted) {
             JsfUtil.addErrorMessage("Cancellation already started");
             return;
         }
         cancellationStarted = true;
-        
+
         if (getBill() != null && getBill().getId() != null && getBill().getId() != 0) {
             if (pharmacyErrorCheck()) {
                 cancellationStarted = false;
@@ -3779,7 +3830,7 @@ public class PharmacyBillSearch implements Serializable {
             JsfUtil.addErrorMessage("No Bill");
             return;
         }
-        
+
         // Set default email if available
         if (bill.getToInstitution() != null && bill.getToInstitution().getEmail() != null) {
             emailRecipient = bill.getToInstitution().getEmail();
@@ -3793,7 +3844,7 @@ public class PharmacyBillSearch implements Serializable {
             JsfUtil.addErrorMessage("No Bill");
             return;
         }
-        
+
         if (emailRecipient == null || emailRecipient.trim().isEmpty()) {
             JsfUtil.addErrorMessage("Please enter recipient email");
             return;

@@ -9,53 +9,246 @@
                 xmlns:p="http://primefaces.org/ui">
 
     <ui:define name="subcontent">
-        <div class="container-fluid" >
-            <div class="card" >
-                <div class="card-header" >
-                    <h2>Upload Fee List Item Fees</h2>
+        <div class="container-fluid">
+            <p:growl id="msg"/>
+            
+            <!-- Main Upload Card -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">
+                        <i class="fa fa-upload me-2"></i>
+                        Upload Fee List Item Fees
+                    </h2>
                 </div>
 
-                <div class="card-body" >
+                <div class="card-body">
                     <h:form enctype="multipart/form-data">
-                        <p:fileUpload value="#{dataUploadController.file}"
-                                      mode="simple"
-                                      label="Choose File"/>
-                        <p:commandButton value="Upload"
-                                         action="#{dataUploadController.uploadFeeListItemFees}"
-                                         ajax="false"/>
+                        <!-- Fee List Selection -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <i class="fa fa-info-circle me-2"></i>
+                                    <strong>Step 1:</strong> Select the Fee List to which you want to add item fees.
+                                </div>
+                                
+                                <p:panelGrid columns="2" styleClass="w-100">
+                                    <p:outputLabel value="Select Fee List:" for="feeListSelect" styleClass="fw-bold"/>
+                                    <p:selectOneMenu 
+                                        id="feeListSelect"
+                                        value="#{dataUploadController.selectedFeeList}" 
+                                        filter="true"
+                                        styleClass="w-100"
+                                        filterMatchMode="contains"
+                                        required="true">
+                                        <f:selectItem itemLabel="-- Select Fee List --" itemValue="#{null}"/>
+                                        <f:selectItems 
+                                            value="#{categoryController.feeListTypes}"
+                                            var="feeList" 
+                                            itemLabel="#{feeList.name}" 
+                                            itemValue="#{feeList}"/>
+                                        <p:ajax event="change" update="uploadSection"/>
+                                    </p:selectOneMenu>
+                                </p:panelGrid>
+                            </div>
+                        </div>
 
+                        <!-- Upload Section -->
+                        <h:panelGroup id="uploadSection">
+                            <div class="row mb-4" rendered="#{dataUploadController.selectedFeeList != null}">
+                                <div class="col-12">
+                                    <div class="alert alert-success">
+                                        <i class="fa fa-check-circle me-2"></i>
+                                        <strong>Step 2:</strong> Upload Excel file with item fees for 
+                                        <strong>#{dataUploadController.selectedFeeList.name}</strong>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <p:fileUpload 
+                                                value="#{dataUploadController.file}"
+                                                mode="simple"
+                                                label="Choose Excel File"
+                                                accept=".xlsx,.xls"
+                                                styleClass="w-100"/>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p:commandButton 
+                                                value="Upload &amp; Process"
+                                                icon="fa fa-upload"
+                                                action="#{dataUploadController.uploadFeeListItemFees}"
+                                                ajax="true"
+                                                styleClass="ui-button-success ui-button-lg w-100"
+                                                process="@form"
+                                                update="msg errorSection"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4" rendered="#{dataUploadController.selectedFeeList == null}">
+                                <div class="col-12">
+                                    <div class="alert alert-warning">
+                                        <i class="fa fa-exclamation-triangle me-2"></i>
+                                        Please select a Fee List first to enable file upload.
+                                    </div>
+                                </div>
+                            </div>
+                        </h:panelGroup>
+
+                        <!-- Error Display Section -->
+                        <h:panelGroup id="errorSection">
+                            <h:panelGroup rendered="#{not empty dataUploadController.uploadErrors}">
+                                <div class="card mt-4">
+                                    <div class="card-header bg-danger text-white">
+                                        <h5 class="mb-0">
+                                            <i class="fa fa-exclamation-triangle me-2"></i>
+                                            Upload Errors Found
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-danger mb-3">
+                                            <i class="fa fa-info-circle me-2"></i>
+                                            <strong>#{empty dataUploadController.uploadErrors ? 0 : dataUploadController.uploadErrors.size()} errors found.</strong> No fees were saved. Please fix the errors below and try again.
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <label for="errorDetails" class="form-label fw-bold">Error Details:</label>
+                                                <p:inputTextarea
+                                                    id="errorDetails"
+                                                    value="#{dataUploadController.uploadErrorDetails}"
+                                                    rows="15"
+                                                    cols="100"
+                                                    readonly="true"
+                                                    styleClass="form-control"
+                                                    style="font-family: monospace; font-size: 0.9em; background-color: #f8f9fa;"/>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-3">
+                                            <p:commandButton 
+                                                value="Clear Errors"
+                                                icon="fa fa-times"
+                                                action="#{dataUploadController.clearUploadErrors}"
+                                                ajax="true"
+                                                styleClass="ui-button-secondary"
+                                                update="errorSection :msg"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                        </h:panelGroup>
                     </h:form>
 
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Column</th>
-                                <th>Title</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>A</td>
-                                <td>Item Code</td>
-                            </tr>
-                            <tr>
-                                <td>B</td>
-                                <td>Item Name</td>
-                            </tr>
-                            <tr>
-                                <td>C</td>
-                                <td>Fee List Type</td>
-                            </tr>
-                            <tr>
-                                <td>E</td>
-                                <td>Fee</td>
-                            </tr>
-                            <tr>
-                                <td>F</td>
-                                <td>foreign fee</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <!-- Instructions Card -->
+                    <div class="card mt-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">
+                                <i class="fa fa-file-excel me-2"></i>
+                                Excel File Format Instructions
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info mb-3">
+                                <i class="fa fa-lightbulb me-2"></i>
+                                <strong>Important:</strong> Fee List is now selected above, so you don't need to include it in the Excel file.
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th width="10%">Column</th>
+                                            <th width="20%">Field Name</th>
+                                            <th width="15%">Required</th>
+                                            <th width="55%">Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="table-warning">
+                                            <td><strong>A</strong></td>
+                                            <td><strong>Item Code</strong></td>
+                                            <td><span class="badge bg-danger">Required</span></td>
+                                            <td>
+                                                <strong>Unique item code to identify the item.</strong> Must exactly match existing item codes in the system.
+                                                <br/><small class="text-muted">Example: LAB001, SRG002, etc.</small>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>B</td>
+                                            <td>Item Name</td>
+                                            <td><span class="badge bg-secondary">Optional</span></td>
+                                            <td>
+                                                Item name for reference only. This is ignored during processing.
+                                                <br/><small class="text-muted">Used for human readability in the Excel file.</small>
+                                            </td>
+                                        </tr>
+                                        <tr class="table-info">
+                                            <td><strong>C</strong></td>
+                                            <td><strong>Fee Amount</strong></td>
+                                            <td><span class="badge bg-warning">Required</span></td>
+                                            <td>
+                                                <strong>Local fee amount for this item.</strong> Enter numeric value only.
+                                                <br/><small class="text-muted">Example: 1500.00, 250, etc.</small>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>D</td>
+                                            <td>Foreign Fee</td>
+                                            <td><span class="badge bg-secondary">Optional</span></td>
+                                            <td>
+                                                Fee amount for foreigners. If not provided, local fee will be used.
+                                                <br/><small class="text-muted">Example: 2000.00, 350, etc.</small>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>E</td>
+                                            <td>Discount Allowed</td>
+                                            <td><span class="badge bg-secondary">Optional</span></td>
+                                            <td>
+                                                Whether discounts are allowed for this fee. 
+                                                <br/><small class="text-muted">Accepted values: "Yes", "True", "1" for allowed, anything else for not allowed.</small>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Sample Data -->
+                            <div class="mt-4">
+                                <h6>Sample Excel Data:</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered" style="font-size: 0.9em;">
+                                        <thead class="table-secondary">
+                                            <tr>
+                                                <th>A (Item Code)</th>
+                                                <th>B (Item Name)</th>
+                                                <th>C (Fee)</th>
+                                                <th>D (Foreign Fee)</th>
+                                                <th>E (Discount Allowed)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>LAB001</td>
+                                                <td>Full Blood Count</td>
+                                                <td>1200.00</td>
+                                                <td>1500.00</td>
+                                                <td>Yes</td>
+                                            </tr>
+                                            <tr>
+                                                <td>SRG002</td>
+                                                <td>Appendectomy</td>
+                                                <td>25000.00</td>
+                                                <td>35000.00</td>
+                                                <td>No</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

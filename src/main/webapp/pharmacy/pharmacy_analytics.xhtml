@@ -153,10 +153,12 @@
                                             <p:commandButton rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Analytics - Show Stock Taking Report(New)')}" class="w-100 ui-button-warning" value="Stock Taking Report(New)" action="pharmacy_report_adjustment_bill_for_stock_taking?faces-redirect=true" ajax="false" />
                                             <p:commandButton rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Analytics - Show Stock With Movement')}" class="w-100 ui-button-warning" value="Stock With Movement" action="pharmacy_report_item_stock_sale?faces-redirect=true" ajax="false" />
 
-                                            <p:commandButton rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Analytics - Show Stock Summary (with Suppliers)')}" 
+                                            <p:commandButton rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Analytics - Show Stock Adjustment Variance Report',true)}" class="w-100 ui-button-warning" value="Stock Adjustment Variance" action="#{pharmacyController.navigateToStockAdjustmentVariance}" ajax="false" />
+
+                                            <p:commandButton rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Analytics - Show Stock Summary (with Suppliers)')}"
                                                              class="w-100"
-                                                             value="Stock Summary (with Suppliers)" 
-                                                             action="pharmacy_stock_summary_with_supplier?faces-redirect=true" 
+                                                             value="Stock Summary (with Suppliers)"
+                                                             action="pharmacy_stock_summary_with_supplier?faces-redirect=true"
                                                              ajax="false" >
                                             </p:commandButton>   
 

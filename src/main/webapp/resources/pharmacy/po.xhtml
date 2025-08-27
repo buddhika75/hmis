@@ -125,23 +125,23 @@
 
                                     </td>
                                     <td style="width: 100px; text-align: right; padding-right: 5px; border: 1px solid black;">
-                                        <h:outputText value="#{bip.pharmaceuticalBillItem.purchaseRate}">
+                                        <h:outputText value="#{bip.billItemFinanceDetails.lineGrossRate}">
                                             <f:convertNumber pattern="#,##0.00" />
                                         </h:outputText>
                                     </td>
                                     <td style="width: 100px; text-align: right; padding-right: 5px; border: 1px solid black;">
-                                        <h:outputText value="#{bip.pharmaceuticalBillItem.qty}">
+                                        <h:outputText value="#{bip.billItemFinanceDetails.quantity}">
                                             <f:convertNumber />
                                         </h:outputText>
                                     </td>
                                     <td style="width: 100px; text-align: right; padding-right: 5px; border: 1px solid black;">
-                                        <h:outputText value="#{bip.pharmaceuticalBillItem.freeQty}">
+                                        <h:outputText value="#{bip.billItemFinanceDetails.freeQuantity}">
                                             <f:convertNumber />
                                         </h:outputText>
                                     </td>
 
                                     <td style="width: 100px; text-align: right; padding-right: 5px; border: 1px solid black; font-weight: bold;">
-                                        <h:outputText value="#{bip.pharmaceuticalBillItem.purchaseRate * bip.pharmaceuticalBillItem.qty}">
+                                        <h:outputText value="#{bip.billItemFinanceDetails.lineGrossTotal}">
                                             <f:convertNumber pattern="#,###.00" />
                                         </h:outputText>
                                     </td>

@@ -72,8 +72,7 @@
                     </p:column>
 
                     <p:column headerText="Adjust">
-                        <p:commandButton ajax="false" value="Adjust" 
-                                        action="pharmacy_variant_adjustment">
+                        <p:commandButton ajax="false" value="Adjust" action="pharmacy_variant_adjustment" rendered="#{webUserController.hasPrivilege('PharmacyPhysicalCountApprove')}">
                             <f:setPropertyActionListener target="#{variantAdjustment.reportedBill}" value="#{b}"/>
                         </p:commandButton>
                     </p:column>

@@ -13,6 +13,7 @@ public class BillItemDTO implements Serializable {
     private String batchNo;
     private Double qty;
     private Double costRate;
+    private Double purchaseRate;
     private Double retailRate;
     private Double billNetTotal;
     private Long id;
@@ -45,8 +46,9 @@ public class BillItemDTO implements Serializable {
         this.paymentMethod = paymentMethod;
     }
 
+    //Cost of Good Sold report-sale report
     public BillItemDTO(Long id, Long billId, Date createdAt, String name, String code,
-            String deptId, String batchNo, Double qty, Double costRate,
+            String deptId, String batchNo, Double qty, Double costRate, Double purchaseRate,
             Double retailRate, Double netTotal) {
         this.id = id;
         this.billId = billId;
@@ -57,6 +59,7 @@ public class BillItemDTO implements Serializable {
         this.batchNo = batchNo;
         this.qty = qty;
         this.costRate = costRate;
+        this.purchaseRate = purchaseRate;
         this.retailRate = retailRate;
         this.billNetTotal = netTotal;
     }
@@ -173,6 +176,14 @@ public class BillItemDTO implements Serializable {
 
     public void setBillId(Long billId) {
         this.billId = billId;
+    }
+
+    public Double getPurchaseRate() {
+        return purchaseRate;
+    }
+
+    public void setPurchaseRate(Double purchaseRate) {
+        this.purchaseRate = purchaseRate;
     }
 
 }

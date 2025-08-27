@@ -1,6 +1,7 @@
 package com.divudi.bean.common;
 
 import com.divudi.core.data.HistoryType;
+import static com.divudi.core.data.HistoryType.RepaymentToCollectingCentre;
 import com.divudi.core.entity.AgentHistory;
 import com.divudi.core.entity.AuditEvent;
 import com.divudi.core.entity.Bill;
@@ -101,6 +102,9 @@ public class AgentAndCcApplicationController {
                 break;
             case RepaymentToCollectingCentre:
                 handleCcRePayment(collectingCentre, hospitalFee, collectingCentreFee, staffFee, transactionValue, bill);
+                break;
+            case RepaymentToCollectingCentreCancel:
+                handleCcRePaymentCancel(collectingCentre, transactionValue, bill);
                 break;
             default:
                 Map<String, Object> errorInfo = new LinkedHashMap<>();
@@ -211,7 +215,7 @@ public class AgentAndCcApplicationController {
             agentHistory.setDepartment(bill.getDepartment());
             agentHistory.setAgency(collectingCentre);
             agentHistory.setReferenceNumber(bill.getAgentRefNo());
-            agentHistory.setHistoryType(HistoryType.CollectingCentreBillingCancel);
+            agentHistory.setHistoryType(HistoryType.RepaymentToCollectingCentreCancel);
             agentHistory.setCompanyTransactionValue(0 - Math.abs(hospitalFee));
             agentHistory.setAgentTransactionValue(0 - Math.abs(collectingCentreFee));
             agentHistory.setStaffTrasnactionValue(0 - Math.abs(staffFee));
@@ -428,7 +432,7 @@ public class AgentAndCcApplicationController {
             agentHistory.setStaffTrasnactionValue(0);
             agentHistory.setTransactionValue(Math.abs(transactionValue));
             agentHistory.setAdjustmentToAgencyBalance(Math.abs(transactionValue));
-            agentHistory.setPaidAmountByAgency(null);
+            agentHistory.setPaidAmountByAgency(Math.abs(transactionValue));
             agentHistory.setComment(comment);
 
             double balanceBeforeTx = collectingCentre.getBallance();
@@ -572,6 +576,49 @@ public class AgentAndCcApplicationController {
             
             bill.setAgentHistory(agentHistory);
             billFacade.edit(bill);
+
+            collectingCentre.setBallance(balanceAfterTx);
+            institutionFacade.editAndCommit(collectingCentre);
+
+        } finally {
+            lock.unlock();
+        }
+    }
+    
+    private void handleCcRePaymentCancel(Institution collectingCentre, double transactionValue, Bill bill) {
+        Long collectingCentreId = collectingCentre.getId(); // Assuming each Institution has a unique ID
+        Lock lock = lockMap.computeIfAbsent(collectingCentreId, id -> new ReentrantLock());
+        lock.lock();
+        try {
+
+            collectingCentre = institutionFacade.findWithoutCache(collectingCentre.getId());
+            AgentHistory agentHistory = new AgentHistory();
+            agentHistory.setCreatedAt(new Date());
+            agentHistory.setCreater(bill.getCreater());
+            agentHistory.setBill(bill);
+            agentHistory.setInstitution(bill.getInstitution());
+            agentHistory.setDepartment(bill.getDepartment());
+            agentHistory.setAgency(collectingCentre);
+            agentHistory.setReferenceNumber(bill.getAgentRefNo());
+            agentHistory.setHistoryType(HistoryType.RepaymentToCollectingCentreCancel);
+            agentHistory.setCompanyTransactionValue(0);
+            agentHistory.setAgentTransactionValue(Math.abs(transactionValue));
+            agentHistory.setStaffTrasnactionValue(0);
+            agentHistory.setTransactionValue(Math.abs(transactionValue));
+            agentHistory.setPaidAmountByAgency(Math.abs(transactionValue));
+
+            double balanceBeforeTx = collectingCentre.getBallance();
+
+            double balanceAfterTx = balanceBeforeTx + Math.abs(transactionValue);
+
+            agentHistory.setBalanceBeforeTransaction(
+                    CommonFunctions.roundToTwoDecimalsBigDecimal(balanceBeforeTx)
+            );
+            agentHistory.setBalanceAfterTransaction(
+                    CommonFunctions.roundToTwoDecimalsBigDecimal(balanceAfterTx)
+            );
+
+            agentHistoryFacade.createAndFlush(agentHistory);
 
             collectingCentre.setBallance(balanceAfterTx);
             institutionFacade.editAndCommit(collectingCentre);

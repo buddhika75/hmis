@@ -195,7 +195,7 @@
                             <f:convertNumber pattern="#0.00" />
                         </h:outputLabel>
                         <f:facet name="footer">
-                            <h:outputLabel value="#{cc.attrs.bill.billFinanceDetails.totalPurchaseValue}"
+                            <h:outputLabel value="#{0-cc.attrs.bill.billFinanceDetails.totalPurchaseValue}"
                                            rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Transfer Issue - Show Rate and Value', false) and webUserController.hasPrivilege('PharmacyTransferViewRates')}">
                                 <f:convertNumber pattern="#0.00" />
                             </h:outputLabel>
@@ -223,7 +223,7 @@
                             <f:convertNumber pattern="#0.00" />
                         </h:outputLabel>
                         <f:facet name="footer">
-                            <h:outputLabel value="#{cc.attrs.bill.billFinanceDetails.totalRetailSaleValue}"
+                            <h:outputLabel value="#{0-cc.attrs.bill.billFinanceDetails.totalRetailSaleValue}"
                                            rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Transfer Issue - Show Rate and Value', false) and webUserController.hasPrivilege('PharmacyTransferViewRates')}">
                                 <f:convertNumber pattern="#0.00" />
                             </h:outputLabel>
@@ -253,7 +253,7 @@
                             <f:convertNumber pattern="#0.00" />
                         </h:outputLabel>
                         <f:facet name="footer">
-                            <h:outputLabel value="#{cc.attrs.bill.billFinanceDetails.grossTotal}"
+                            <h:outputLabel value="#{0-cc.attrs.bill.billFinanceDetails.grossTotal}"
                                            rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Transfer Issue - Show Rate and Value', false) and webUserController.hasPrivilege('PharmacyTransferViewRates')}">
                                 <f:convertNumber pattern="#0.00" />
                             </h:outputLabel>

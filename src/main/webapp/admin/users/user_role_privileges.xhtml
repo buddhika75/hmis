@@ -17,10 +17,10 @@
                         <p:outputLabel value="YOU ARE NOT AUTHERIZED." ></p:outputLabel>
                     </h:panelGroup>
 
-                    <p:panel header="Manage User Role Privilages"  rendered="#{webUserController.hasPrivilege('AdminManagingUsers')}" >
+                    <p:panel header="Manage User Role Privileges"  rendered="#{webUserController.hasPrivilege('AdminManagingUsers')}" >
                         <f:facet name="header" >
                             <i class="fa fa-unlock-alt" aria-hidden="true"/>
-                            <h:outputLabel value="Manage User Role Privilages" class="mx-2"/>
+                            <h:outputLabel value="Manage User Role Privileges" class="mx-2"/>
                         </f:facet>
 
                         <h:panelGrid  columns="3">    
@@ -41,7 +41,7 @@
                                 </p:commandButton>
                             
                                 <p:commandButton 
-                                    value="Update User Role Privilage"  
+                                    value="Update Manage User Role Privileges"
                                     action="#{userPrivilageController.saveUserRolePrivileges}"
                                     class="ui-button-warning"
                                     ajax="false" 

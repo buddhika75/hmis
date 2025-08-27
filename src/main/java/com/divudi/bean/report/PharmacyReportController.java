@@ -2030,6 +2030,7 @@ public class PharmacyReportController implements Serializable {
                     .append("pbi.itemBatch.batchNo, ")
                     .append("bi.qty, ")
                     .append("pbi.itemBatch.costRate, ")
+                    .append("pbi.itemBatch.purcahseRate, ")
                     .append("pbi.retailRate, ")
                     .append("bi.bill.netTotal) ")
                     .append("FROM BillItem bi ")

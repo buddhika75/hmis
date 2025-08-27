@@ -116,7 +116,11 @@
                                     <f:setPropertyActionListener target="#{pharmacyBillSearch.bill}" value="#{p}"/>
                                 </h:commandLink>
                             </p:column>
-                            <p:column headerText="Consignment" width="5em">
+                            <p:column 
+                                headerText="Consignment" 
+                                width="2em" 
+                                rendered="#{configOptionApplicationController.getBooleanValueByKey('Enable Consignment in Pharmacy Purchasing',true)}"
+                                styleClass="text-enter">
                                 <h:outputText value="#{p.consignment ? 'Yes' : 'No'}" />
                             </p:column>
 
@@ -124,22 +128,58 @@
                                 headerText="Actions"
                                 width="6em">
                                 <div class="row">
-                                    <div class="d-flex gap-2 mb-1">
+                                    <div class="d-flex gap-1 mb-1">
+
                                         <p:commandButton
                                             ajax="false"
                                             value="Receive"
-                                            class="w-100 ui-button-warning"
+                                            title="Goos Receive when Costing is not managed."
+                                            class="ui-button-warning"
                                             rendered="#{!configOptionApplicationController.getBooleanValueByKey('Manage Costing', true)}"
                                             action="#{grnController.navigateToResive()}"
                                             disabled="#{p.cancelled or p.billClosed or p.fullyIssued}">
                                             <f:setPropertyActionListener target="#{grnController.approveBill}" value="#{p}"/>
                                         </p:commandButton>
+                                        <!--
+                                        These were the methods used earlier before the feature of adding the feature of Saving GRNs.
+                                        THey are not yet deleted just to detect errors by QA.
+                                        Once QA is completed. these buttons and relevant methods will be removed.
+                                        
+                                        
                                         <p:commandButton
                                             ajax="false"
                                             value="Receive"
-                                            class="w-100 ui-button-warning"
+                                            class="ui-button-warning"
                                             rendered="#{configOptionApplicationController.getBooleanValueByKey('Manage Costing', true)}"
                                             action="#{grnCostingController.navigateToResiveCosting()}"
+                                            disabled="#{p.cancelled or p.billClosed or p.fullyIssued}">
+                                            <f:setPropertyActionListener target="#{grnCostingController.approveBill}" value="#{p}"/>
+                                        </p:commandButton>
+                                        
+                                        
+
+                                        <p:commandButton
+                                            ajax="false"
+                                            value="Create GRN"
+                                            class="ui-button-info"
+                                            title="Create a GRN for Selected Approved PO without costing"
+                                            styleClass="w-100"
+                                            rendered="#{!configOptionApplicationController.getBooleanValueByKey('Manage Costing', true)}"
+                                            action="#{grnController.navigateToResiveWithSaveApprove()}"
+                                            disabled="#{p.cancelled or p.billClosed or p.fullyIssued}">
+                                            <f:setPropertyActionListener target="#{grnController.approveBill}" value="#{p}"/>
+                                        </p:commandButton>
+                                        
+                                        -->
+
+
+                                        <p:commandButton
+                                            ajax="false"
+                                            value="Create GRN"
+                                            styleClass="ui-button-info w-100"
+                                            title="Create a GRN for Selected Approved PO with costing"
+                                            rendered="#{configOptionApplicationController.getBooleanValueByKey('Manage Costing', true)}"
+                                            action="#{grnCostingController.navigateToResiveCostingWithSaveApprove()}"
                                             disabled="#{p.cancelled or p.billClosed or p.fullyIssued}">
                                             <f:setPropertyActionListener target="#{grnCostingController.approveBill}" value="#{p}"/>
                                         </p:commandButton>
@@ -148,7 +188,7 @@
                                         <p:commandButton 
                                             ajax="false" 
                                             class="w-100 ui-button-info"
-                                            value="Receive Wholesale" 
+                                            value="Create Wholesale GRN" 
                                             rendered="#{configOptionApplicationController.getBooleanValueByKey('Manage Pharmacy Wholesales', true)}"
                                             action="#{grnController.navigateToReceiveWholesale()}" 
                                             disabled="#{p.cancelled or p.billClosed or p.fullyIssued}">
@@ -226,15 +266,34 @@
                                         </h:outputText>
                                     </p:column>
 
-                                    <p:column headerText="Actions" width="3em">
-                                        <h:panelGroup layout="block" styleClass="btn-group">
+                                    <p:column headerText="Actions" width="5em">
+                                        <h:panelGroup layout="block" styleClass="d-flex gap-1">
                                             <p:commandButton  
-                                                class="m-1"  
+                                                class="ui-button-info"  
                                                 icon="fa fa-eye"
-                                                title="View GRN" 
+                                                title="View Finalized GRN" 
                                                 ajax="false"
+                                                rendered="#{b.billTypeAtomic eq 'PHARMACY_GRN'}"
                                                 action="#{pharmacyBillSearch.navigateToViewPharmacyGrn()}" 
                                                 actionListener="#{pharmacyBillSearch.calTotalSaleRate(b)}">
+                                                <f:setPropertyActionListener target="#{pharmacyBillSearch.bill}" value="#{b}"/>
+                                            </p:commandButton>
+                                            <p:commandButton  
+                                                class="ui-button-warning"  
+                                                icon="fa fa-edit"
+                                                title="Edit Saved GRN" 
+                                                ajax="false"
+                                                rendered="#{b.billTypeAtomic eq 'PHARMACY_GRN_PRE' and !configOptionApplicationController.getBooleanValueByKey('Manage Costing', true)}"
+                                                action="#{pharmacyBillSearch.navigateToEditSavedGrn()}">
+                                                <f:setPropertyActionListener target="#{pharmacyBillSearch.bill}" value="#{b}"/>
+                                            </p:commandButton>
+                                            <p:commandButton  
+                                                class="ui-button-warning"  
+                                                icon="fa fa-edit"
+                                                title="Edit Saved GRN with Costing" 
+                                                ajax="false"
+                                                rendered="#{b.billTypeAtomic eq 'PHARMACY_GRN_PRE' and configOptionApplicationController.getBooleanValueByKey('Manage Costing', true)}"
+                                                action="#{pharmacyBillSearch.navigateToEditSavedGrnCosting()}">
                                                 <f:setPropertyActionListener target="#{pharmacyBillSearch.bill}" value="#{b}"/>
                                             </p:commandButton>
                                         </h:panelGroup>

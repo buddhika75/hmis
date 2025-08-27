@@ -10,6 +10,7 @@ import com.divudi.core.util.JsfUtil;
 import com.divudi.core.data.BillClassType;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import javax.persistence.TemporalType;
 import com.divudi.core.data.BillNumberSuffix;
 import com.divudi.core.data.BillType;
@@ -132,13 +133,11 @@ public class TransferReceiveController implements Serializable {
             JsfUtil.addErrorMessage("Nothing to received");
             return null;
         }
-        
         // Check if already fully received to prevent over-receiving
         if (isAlreadyReceived(issuedBill)) {
             JsfUtil.addErrorMessage("Already Received!");
             return null;
         }
-        
         printPreview=false;
         generateBillComponent();
         return "/pharmacy/pharmacy_transfer_receive?faces-redirect=true";
@@ -342,8 +341,8 @@ public class TransferReceiveController implements Serializable {
             issuedQtyInUnits = Math.abs(issuedItem.getPharmaceuticalBillItem().getQty());
         }
 
-        // Get fresh receive data from database
-        String jpql = "SELECT b FROM Bill b WHERE b.referenceBill.id = :issueBillId AND b.billType = :receiveType";
+        // Get fresh receive data from database - only saved bills
+        String jpql = "SELECT b FROM Bill b WHERE b.backwardReferenceBill.id = :issueBillId AND b.billType = :receiveType AND b.id IS NOT NULL";
         Map<String, Object> params = new HashMap<>();
         params.put("issueBillId", issuedItem.getBill().getId());
         params.put("receiveType", BillType.PharmacyTransferReceive);
@@ -356,9 +355,15 @@ public class TransferReceiveController implements Serializable {
                 continue; // Skip cancelled receives
             }
             
+            // Include all receive bills including the current one being processed
+            // (We want to count all receives to determine if the issue is fully complete)
+            
             List<BillItem> receiveItems = billService.fetchBillItems(receiveBill);
             for (BillItem receiveItem : receiveItems) {
-                if (receiveItem.getPharmaceuticalBillItem() != null) {
+                // Only count items that reference the same issued item
+                if (receiveItem.getReferanceBillItem() != null && 
+                    Objects.equals(receiveItem.getReferanceBillItem().getId(), issuedItem.getId()) &&
+                    receiveItem.getPharmaceuticalBillItem() != null) {
                     totalReceivedQty += Math.abs(receiveItem.getPharmaceuticalBillItem().getQty());
                 }
             }
@@ -372,34 +377,27 @@ public class TransferReceiveController implements Serializable {
             return false;
         }
         
-        List<BillItem> issuedItems = billService.fetchBillItems(getIssuedBill());
         List<BillItem> receivingItems = getReceivedBill().getBillItems();
         
         if (receivingItems == null || receivingItems.isEmpty()) {
             return false;
         }
         
-        // Check each issued item against its corresponding receiving items
-        for (BillItem issuedItem : issuedItems) {
-            double issuedQty = 0.0;
-            if (issuedItem.getPharmaceuticalBillItem() != null) {
-                issuedQty = Math.abs(issuedItem.getPharmaceuticalBillItem().getQty());
+        // Check each receiving item against its reference issued item
+        for (BillItem receivingItem : receivingItems) {
+            if (receivingItem.getReferanceBillItem() == null) {
+                continue; // Skip items without reference
             }
+            
+            BillItem issuedItem = receivingItem.getReferanceBillItem();
             
             // Get current remaining quantity (excluding this receive bill)
             double currentRemainingQty = calculateRemainingQtyWithFreshData(issuedItem);
             
-            // Get the quantity being received in this bill for the same item
+            // Get the quantity being received for this specific item
             double quantityBeingReceived = 0.0;
-            for (BillItem receivingItem : receivingItems) {
-                if (receivingItem.getItem() != null && 
-                    issuedItem.getItem() != null &&
-                    receivingItem.getItem().getId().equals(issuedItem.getItem().getId())) {
-                    
-                    if (receivingItem.getPharmaceuticalBillItem() != null) {
-                        quantityBeingReceived += Math.abs(receivingItem.getPharmaceuticalBillItem().getQty());
-                    }
-                }
+            if (receivingItem.getPharmaceuticalBillItem() != null) {
+                quantityBeingReceived = Math.abs(receivingItem.getPharmaceuticalBillItem().getQty());
             }
             
             // Check if this receive would cause over-receiving

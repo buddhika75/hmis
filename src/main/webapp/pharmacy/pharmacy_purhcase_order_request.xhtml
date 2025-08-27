@@ -67,13 +67,17 @@
                                     <p:inputText 
                                         autocomplete="off"  
                                         id="qty" 
-                                        value="#{bi.qty}" 
+                                        value="#{bi.billItemFinanceDetails.quantity}" 
                                         style="padding: 0;" 
                                         label="Qty"
                                         class="text-end w-100"
                                         onfocus="this.select()">  
                                         <f:convertNumber pattern="0.#" ></f:convertNumber>
-                                        <f:ajax event="blur" render="total :#{p:resolveFirstComponentWithId('tot',view).clientId} "  execute="@this price" listener="#{purchaseOrderRequestController.onEdit(bi)}" ></f:ajax>
+                                        <f:ajax 
+                                            event="blur" 
+                                            render="total :#{p:resolveFirstComponentWithId('tot',view).clientId} "  
+                                            execute="@this price" 
+                                            listener="#{purchaseOrderRequestController.onEdit(bi)}" ></f:ajax>
                                     </p:inputText>
                                 </p:column> 
 
@@ -87,11 +91,16 @@
                                         id="freeQty" 
                                         onfocus="this.select()"
                                         class="text-end w-100"
-                                        value="#{bi.pharmaceuticalBillItem.freeQty}" 
+                                        value="#{bi.billItemFinanceDetails.freeQuantity}" 
                                         style="padding: 0;" 
                                         label="Qty">  
                                         <f:convertNumber pattern="0.#" ></f:convertNumber>
-                                        <f:ajax event="blur" render="total :#{p:resolveFirstComponentWithId('tot',view).clientId} "  execute="@this price" listener="#{purchaseOrderRequestController.onEdit(bi)}" ></f:ajax>
+                                        <f:ajax 
+                                            event="blur" 
+                                            render="total :#{p:resolveFirstComponentWithId('tot',view).clientId} " 
+                                            execute="@this price" 
+                                            listener="#{purchaseOrderRequestController.onEdit(bi)}" >
+                                        </f:ajax>
                                     </p:inputText>
                                 </p:column>
 
@@ -106,7 +115,7 @@
                                             onfocus="this.select()"
                                             autocomplete="off" 
                                             style="padding: 0;" 
-                                            value="#{bi.pharmaceuticalBillItem.purchaseRate}" 
+                                            value="#{bi.billItemFinanceDetails.lineGrossRate}" 
                                             class="w-100 text-end">
                                             <f:convertNumber pattern="#,##0.00"/>
                                             <f:ajax event="blur" render="total :#{p:resolveFirstComponentWithId('tot',view).clientId}"  execute="@this qty" listener="#{purchaseOrderRequestController.onEdit(bi)}" ></f:ajax>
@@ -122,7 +131,7 @@
                                     <h:panelGroup id="total">
                                         <h:outputText 
                                             id="lblTotal"
-                                            value="#{bi.pharmaceuticalBillItem.purchaseRate*bi.pharmaceuticalBillItem.qty}" >
+                                            value="#{bi.netValue}" >
                                             <f:convertNumber pattern="#,##0.00"/>
                                         </h:outputText>
                                     </h:panelGroup>
@@ -253,13 +262,13 @@
                                     id="btnSave"
                                     ajax="false" 
                                     value="Save" 
-                                    action="#{purchaseOrderRequestController.request}"
+                                    action="#{purchaseOrderRequestController.saveRequest}"
                                     icon="pi pi-save" 
                                     class="ui-button-success m-1"/>
                                 <p:commandButton 
                                     ajax="false" 
                                     value="Finalize" 
-                                    action="#{purchaseOrderRequestController.requestFinalize()}"
+                                    action="#{purchaseOrderRequestController.finalizeRequest()}"
                                     icon="pi pi-check" 
                                     class="ui-button-warning m-1"/>
                                 <p:commandButton 
@@ -475,17 +484,17 @@
                                                     <td style="border: 1px solid black;"><h:outputLabel value="#{bi.item.code}"/></td>
                                                     <td style="border: 1px solid black;"><h:outputLabel value="#{bi.item.name}"/></td>
                                                     <td style="text-align: right; border: 1px solid black;">
-                                                        <h:outputLabel value="#{bi.pharmaceuticalBillItem.qty}">
+                                                        <h:outputLabel value="#{bi.billItemFinanceDetails.quantity}">
                                                             <f:convertNumber pattern="#,##0"/>
                                                         </h:outputLabel>
                                                     </td>
                                                     <td style="text-align: right; border: 1px solid black;">
-                                                        <h:outputLabel value="#{bi.pharmaceuticalBillItem.freeQty}">
+                                                        <h:outputLabel value="#{bi.billItemFinanceDetails.freeQuantity}">
                                                             <f:convertNumber pattern="#,##0"/>
                                                         </h:outputLabel>
                                                     </td>
                                                     <td style="text-align: right; border: 1px solid black;">
-                                                        <h:outputLabel value="#{bi.pharmaceuticalBillItem.purchaseRate}">
+                                                        <h:outputLabel value="#{bi.billItemFinanceDetails.lineGrossRate}">
                                                             <f:convertNumber pattern="#,##0.00"/>
                                                         </h:outputLabel>
                                                     </td>

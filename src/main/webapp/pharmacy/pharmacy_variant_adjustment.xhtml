@@ -16,7 +16,7 @@
                         <h:panelGrid columns="4" style="min-width: 100%;">
                             <p:outputLabel value="Purchase order Request Order"/>
                             <p:commandButton action="#{variantAdjustment.onlyVariantItemBySystemStock()}" ajax="false" value="View Only Variant Item By System Stock"/>
-                            <p:commandButton ajax="false"  value="Approve" action="#{variantAdjustment.adjust}"/>
+                            <p:commandButton ajax="false" value="Approve" action="#{variantAdjustment.adjust}" rendered="#{webUserController.hasPrivilege('PharmacyPhysicalCountApprove')}"/>
                             <p:commandButton value="Print" ajax="false" >
                                 <p:printer target="gpBillPreview" ></p:printer>
                             </p:commandButton>

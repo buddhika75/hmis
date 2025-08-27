@@ -37,52 +37,54 @@
         <div class="receipt-bill-details">
             <h:outputText
                     value="#{transferRequestController.fillHeaderDataOfTransferRequest(configOptionApplicationController.getLongTextValueByKey('Pharmacy Transfer Request Receipt Header'), cc.attrs.bill)}"
-                    escape="false" >
-            </h:outputText>
+                    escape="false"
+                    rendered="#{not empty transferRequestController.fillHeaderDataOfTransferRequest(configOptionApplicationController.getLongTextValueByKey('Pharmacy Transfer Request Receipt Header'), cc.attrs.bill)}"/>
         </div>
         </div>
 
         <div class="receipt-separator"><hr /></div>
 
-        <div class="receipt-transfer-details">
-            <table class="receipt-details-table">
-                <tr>
-                    <td>Request From</td>
-                    <td>:</td>
-                    <td>
-                        <h:outputText value="#{cc.attrs.bill.fromDepartment.name}" /> (<h:outputText value="#{cc.attrs.bill.fromDepartment.institution.name}" />)
-                    </td>
-                </tr>
-                <tr>
-                    <td>Request To</td>
-                    <td>:</td>
-                    <td>
-                        <h:outputText value="#{cc.attrs.bill.toDepartment.name}" /> (<h:outputText value="#{cc.attrs.bill.toDepartment.institution.name}" />)
-                    </td>
-                </tr>
-                <tr>
-                    <td>Req No</td>
-                    <td>:</td>
-                    <td><h:outputText value="#{cc.attrs.bill.deptId}" /></td>
-                </tr>
-                <tr>
-                    <td>Req By</td>
-                    <td>:</td>
-                    <td><h:outputText value="#{cc.attrs.bill.creater.webUserPerson.name}" /></td>
-                </tr>
-                <tr>
-                    <td>Req Date/Time</td>
-                    <td>:</td>
-                    <td>
-                        <h:outputText value="#{cc.attrs.bill.createdAt}">
-                            <f:convertDateTime pattern="#{sessionController.applicationPreference.longDateTimeFormat}" />
-                        </h:outputText>
-                    </td>
-                </tr>
-            </table>
-        </div>
+        <ui:fragment rendered="#{empty transferRequestController.fillHeaderDataOfTransferRequest(configOptionApplicationController.getLongTextValueByKey('Pharmacy Transfer Request Receipt Header'), cc.attrs.bill)}">
+            <div class="receipt-transfer-details">
+                <table class="receipt-details-table">
+                    <tr>
+                        <td>Request From</td>
+                        <td>:</td>
+                        <td>
+                            <h:outputText value="#{cc.attrs.bill.fromDepartment.name}" /> (<h:outputText value="#{cc.attrs.bill.fromDepartment.institution.name}" />)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Request To</td>
+                        <td>:</td>
+                        <td>
+                            <h:outputText value="#{cc.attrs.bill.toDepartment.name}" /> (<h:outputText value="#{cc.attrs.bill.toDepartment.institution.name}" />)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Req No</td>
+                        <td>:</td>
+                        <td><h:outputText value="#{cc.attrs.bill.deptId}" /></td>
+                    </tr>
+                    <tr>
+                        <td>Req By</td>
+                        <td>:</td>
+                        <td><h:outputText value="#{cc.attrs.bill.creater.webUserPerson.name}" /></td>
+                    </tr>
+                    <tr>
+                        <td>Req Date/Time</td>
+                        <td>:</td>
+                        <td>
+                            <h:outputText value="#{cc.attrs.bill.createdAt}">
+                                <f:convertDateTime pattern="#{sessionController.applicationPreference.longDateTimeFormat}" />
+                            </h:outputText>
+                        </td>
+                    </tr>
+                </table>
+            </div>
 
-        <div class="receipt-separator"><hr /></div>
+            <div class="receipt-separator"><hr /></div>
+        </ui:fragment>
 
         <div class="receipt-items-section">
             <table class="receipt-items-table">

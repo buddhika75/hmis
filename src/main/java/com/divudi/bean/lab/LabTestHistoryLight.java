@@ -18,12 +18,13 @@ public class LabTestHistoryLight {
     private String departmentName;
     private Staff transporter;
     private WebUser user;
+    private String comment;
 
     public LabTestHistoryLight() {
         
     }
 
-    public LabTestHistoryLight(Long id, TestHistoryType historyType, Date historyAt, String institutionName, String departmentName,Staff transporter, WebUser user) {
+    public LabTestHistoryLight(Long id, TestHistoryType historyType, Date historyAt, String institutionName, String departmentName,Staff transporter, WebUser user, String comment) {
         this.id = id;
         this.historyType = historyType;
         this.historyAt = historyAt;
@@ -31,6 +32,7 @@ public class LabTestHistoryLight {
         this.departmentName = departmentName;
         this.transporter = transporter;
         this.user = user;
+        this.comment = comment;
     }
     
     @Override
@@ -109,6 +111,14 @@ public class LabTestHistoryLight {
 
     public void setTransporter(Staff transporter) {
         this.transporter = transporter;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
 }

@@ -71,11 +71,11 @@
                                                     <h3 class="sample-title">Sample Information</h3>
                                                     <div class="sample-details">
                                                         <div class="sample-row">
-                                                            <span class="sample-label">Sample ID:</span>
+                                                            <span class="sample-label">Sample IDs : </span>
                                                             <span class="sample-value">#{patientInvestigationController.getPatientSample()}</span>
                                                         </div>
                                                         <div class="sample-row">
-                                                            <span class="sample-label">Investigation:</span>
+                                                            <span class="sample-label">Investigation : </span>
                                                             <span class="sample-investigation">#{patientInvestigationController.current.billItem.item.name}</span>
                                                         </div>
                                                     </div>
@@ -90,6 +90,7 @@
                                     <div class="tracking-content">
 
                                         <div class="table-container">
+
                                             <table class="tracking-table">
                                                 <thead>
                                                     <tr class="table-header">
@@ -97,13 +98,59 @@
                                                         <th class="th-cell">Personnel</th>
                                                         <th class="th-cell">Transporter</th>
                                                         <th class="th-cell">Location</th>
+                                                        <th class="th-cell">Comment</th>
                                                         <th class="th-cell">Date</th>
                                                         <th class="th-cell">Time</th>
                                                     </tr>
                                                 </thead>
+
                                                 <tbody>
-                                                    <ui:repeat value="#{enumController.getLabTestHistoryList()}" var="type">
-                                                        <ui:repeat value="#{labTestHistoryController.getLabTestHistoryByInvestigation(patientInvestigationController.current,type)}" var="history">
+                                                    <!--Sample History Data-->
+                                                    <ui:repeat value="#{labTestHistoryController.getCreatedLabTestHistoryByInvestigation(patientInvestigationController.current)}" var="history">
+                                                        <tr class="table-row row-white">
+                                                            <td class="td-cell">
+                                                                <span class="stage-name">#{history.historyType.label}</span>
+                                                            </td>
+                                                            <td class="td-cell">
+                                                                <span class="person-name">#{history.user.webUserPerson.nameWithTitle}</span>
+                                                            </td>
+                                                            <td class="td-cell">
+                                                                <span class="person-name">#{history.transporter != null and history.transporter.person != null ? history.transporter.person.nameWithTitle : 'N/A'}</span>
+                                                            </td>
+                                                            <td class="td-cell">
+                                                                <span class="location-name">#{history.institutionName} - #{history.departmentName}</span>
+                                                            </td>
+                                                            <td class="td-cell">
+                                                                <span class="comment">#{history.comment}</span>
+                                                            </td>
+                                                            <td class="td-cell">
+                                                                <span class="date-text">
+                                                                    <h:outputText value="#{history.historyAt}">
+                                                                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                                    </h:outputText>
+                                                                </span>
+                                                            </td>
+                                                            <td class="td-cell">
+                                                                <span class="time-text">
+                                                                    <h:outputText value="#{history.historyAt}">
+                                                                        <f:convertDateTime pattern="HH:mm:ss" />
+                                                                    </h:outputText>
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    </ui:repeat>
+
+                                                    <!--Sample History Data-->
+                                                    <ui:repeat value="#{patientInvestigationController.getPatientSamplesByInvestigation(patientInvestigationController.current)}" var="sample">
+                                                        <tr class="table-row row-white">
+                                                            <td colspan="7">
+                                                                <div class="sample-card" style="font-size:19px; font-weight: 700;">
+                                                                    <span class="sample-label">Sample ID : </span>
+                                                                    <span class="sample-value">#{sample.id}</span>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <ui:repeat value="#{labTestHistoryController.getLabTestHistoryByInvestigation(patientInvestigationController.current,sample)}" var="history">
                                                             <tr class="table-row row-white">
                                                                 <td class="td-cell">
                                                                     <span class="stage-name">#{history.historyType.label}</span>
@@ -116,6 +163,9 @@
                                                                 </td>
                                                                 <td class="td-cell">
                                                                     <span class="location-name">#{history.institutionName} - #{history.departmentName}</span>
+                                                                </td>
+                                                                <td class="td-cell">
+                                                                    <span class="comment">#{history.comment}</span>
                                                                 </td>
                                                                 <td class="td-cell">
                                                                     <span class="date-text">
@@ -133,9 +183,51 @@
                                                                 </td>
                                                             </tr>
                                                         </ui:repeat>
-
                                                     </ui:repeat>
+
+                                                    <tr class="table-row row-white">
+                                                        <td colspan="7">
+                                                            <div class="sample-card" style="font-size:19px; font-weight: 700;"></div>
+                                                        </td>
+                                                    </tr>
+
+                                                    <!--Patient Report Data-->
+                                                    <ui:repeat value="#{labTestHistoryController.getReportLabTestHistoryByInvestigation(patientInvestigationController.current)}" var="history">
+                                                        <tr class="table-row row-white">
+                                                            <td class="td-cell">
+                                                                <span class="stage-name">#{history.historyType.label}</span>
+                                                            </td>
+                                                            <td class="td-cell">
+                                                                <span class="person-name">#{history.user.webUserPerson.nameWithTitle}</span>
+                                                            </td>
+                                                            <td class="td-cell">
+                                                                <span class="person-name">#{history.transporter != null and history.transporter.person != null ? history.transporter.person.nameWithTitle : 'N/A'}</span>
+                                                            </td>
+                                                            <td class="td-cell">
+                                                                <span class="location-name">#{history.institutionName} - #{history.departmentName}</span>
+                                                            </td>
+                                                            <td class="td-cell">
+                                                                <span class="comment">#{history.comment}</span>
+                                                            </td>
+                                                            <td class="td-cell">
+                                                                <span class="date-text">
+                                                                    <h:outputText value="#{history.historyAt}">
+                                                                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                                    </h:outputText>
+                                                                </span>
+                                                            </td>
+                                                            <td class="td-cell">
+                                                                <span class="time-text">
+                                                                    <h:outputText value="#{history.historyAt}">
+                                                                        <f:convertDateTime pattern="HH:mm:ss" />
+                                                                    </h:outputText>
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    </ui:repeat>
+
                                                 </tbody>
+
                                             </table>
                                         </div>
                                     </div>

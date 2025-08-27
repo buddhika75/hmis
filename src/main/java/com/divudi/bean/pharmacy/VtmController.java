@@ -54,7 +54,7 @@ public class VtmController implements Serializable {
     private BillBeanController billBean;
     List<Vtm> selectedItems;
     private Vtm current;
-    private List<Vtm> items = null;
+    private List<Vtm> items;
     String selectText = "";
     String bulkText = "";
     boolean billedAs;
@@ -63,28 +63,12 @@ public class VtmController implements Serializable {
     private boolean editable;
 
     public String navigateToListAllVtms() {
-        String jpql = "Select vtm "
-                + " from Vtm vtm "
-                + " where vtm.retired=:ret "
-                + " order by vtm.name";
-
-        Map<String, Object> m = new HashMap<>();
-        m.put("ret", false);
-
-        items = getFacade().findByJpql(jpql, m);
-
-        if (items == null) {
-        } else {
-            for (Vtm item : items) {
-            }
-        }
-
         return "/emr/reports/vtms?faces-redirect=true";
     }
 
     public void cleanceVTMs() {
-        items = ejbFacade.findAll();
-        for (Vtm v : getItems()) {
+        List<Vtm> vtms = ejbFacade.findAll();
+        for (Vtm v : vtms) {
             if (v.getName() == null) {
                 return;
             }
@@ -292,10 +276,6 @@ public class VtmController implements Serializable {
         return selectText;
     }
 
-    private void recreateModel() {
-        items = null;
-    }
-
     public void saveSelected() {
         if (getCurrent().getId() != null && getCurrent().getId() > 0) {
             if (!billedAs) {
@@ -321,7 +301,7 @@ public class VtmController implements Serializable {
             getFacade().edit(getCurrent());
             JsfUtil.addSuccessMessage("Saved Successfully");
         }
-        recreateModel();
+        items = null;
         getItems();
         editable = false;
     }
@@ -340,7 +320,8 @@ public class VtmController implements Serializable {
             getFacade().create(getCurrent());
             JsfUtil.addSuccessMessage("Saved Successfully");
         }
-        fillItems();
+        items = null;
+        getItems();
     }
 
     public void setSelectText(String selectText) {
@@ -400,9 +381,9 @@ public class VtmController implements Serializable {
         } else {
             JsfUtil.addSuccessMessage("Nothing to Delete");
         }
-        recreateModel();
-        getItems();
         current = null;
+        items = null;
+        getItems();
         getCurrent();
         editable = false;
     }
@@ -412,11 +393,10 @@ public class VtmController implements Serializable {
     }
 
     public List<Vtm> getItems() {
-        String sql = " select c from Vtm c where "
-                + " c.retired=false "
-                + " order by c.name ";
-
-        items = getFacade().findByJpql(sql);
+        if (items == null) {
+            String sql = "select c from Vtm c where c.retired=false order by c.name";
+            items = getFacade().findByJpql(sql);
+        }
         return items;
     }
 

@@ -1,265 +1,283 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
 
-<h:body>
-    <ui:composition template="/resources/template/template.xhtml">
-        <ui:define name="content">
+    <h:body>
+        <ui:composition template="/resources/template/template.xhtml">
+            <ui:define name="content">
 
-            <h:form>
-                <p:panel header="Pharmacy Transfer Issue Bills Print View (DTO)" styleClass="w-100">
-                    <f:facet name="header">
-                        <div class="d-flex justify-content-between">
-                            <h:outputText value="Pharmacy Transfer Issue Bills Print View" class="mt-2"/>
-                            <div class="d-flex gap-2">
-                                <p:commandButton
+                <h:form>
+                    <p:panel header="Pharmacy Transfer Issue Bills Print View (DTO)" styleClass="w-100">
+                        <f:facet name="header">
+                            <div class="d-flex justify-content-between">
+                                <h:outputText value="Pharmacy Transfer Issue Bills Print View" class="mt-2"/>
+                                <div class="d-flex gap-2">
+                                    <p:commandButton
                                         icon="fa-solid fa-print"
                                         class="ui-button-info"
                                         style="width: 150px"
                                         ajax="false"
                                         value="Print">
-                                    <p:printer target="reportView"/>
-                                </p:commandButton>
-                                <p:commandButton
+                                        <p:printer target="reportView"/>
+                                    </p:commandButton>
+                                    <p:commandButton
                                         ajax="false"
                                         value="Back to Report"
                                         style="width: 200px"
                                         icon="fa fa-arrow-left"
                                         class="ui-button-warning"
                                         action="pharmacy_report_transfer_issue_bill_dto?faces-redirect=true">
-                                </p:commandButton>
+                                    </p:commandButton>
+                                </div>
+
                             </div>
+                        </f:facet>
 
-                        </div>
-                    </f:facet>
+                        <style>
 
-                    <style>
-
-                        @media screen {
-                            .paper {
-                                position: static !important;
-                                width: 297mm !important;
-                                zoom: 2.0;
-                            }
-
-                            table {
-                                border-collapse: collapse;
-                                width: 100%;
-                                font-size: 12px !important;
-                                margin-top: 1mm !important;
-                            }
-
-                            th, td {
-                                border: 1px solid #000;
-                                padding: 0px !important;
-                                margin: 2px !important;
-                                text-align: left;
-                                margin-left: 10mm !important;
-                            }
-
-                            .header {
-                                font-size: 16px !important;
-                            }
-
-                            tfoot {
-                                font-weight: 700 !important;
-                                font-size: 11px !important;
-                            }
-                        }
-
-                        @media print {
-                            @page {
-                                @bottom-right {
-                                    content: "Page " counter(page) " of " counter(pages);
-                                    font-family: Arial, sans-serif;
-                                    font-size: 10pt;
+                            @media screen {
+                                .paper {
+                                    position: static !important;
+                                    width: 297mm !important;
+                                    zoom: 2.0;
                                 }
-                                size: A4 portrait !important;
+
+                                table {
+                                    border-collapse: collapse;
+                                    width: 100%;
+                                    font-size: 12px !important;
+                                    margin-top: 1mm !important;
+                                }
+
+                                th, td {
+                                    border: 1px solid #000;
+                                    padding: 0px !important;
+                                    margin: 2px !important;
+                                    text-align: left;
+                                    margin-left: 10mm !important;
+                                }
+
+                                .header {
+                                    font-size: 16px !important;
+                                }
+
+                                tfoot {
+                                    font-weight: 700 !important;
+                                    font-size: 11px !important;
+                                }
                             }
 
-                            body {
-                                counter-reset: page;
+                            @media print {
+                                @page {
+                                    @bottom-right {
+                                        content: "Page " counter(page) " of " counter(pages);
+                                        font-family: Arial, sans-serif;
+                                        font-size: 10pt;
+                                    }
+                                    size: A4 portrait !important;
+                                }
+
+                                body {
+                                    counter-reset: page;
+                                }
+
+                                .paper {
+                                    position: static !important;
+                                    width: 297mm !important;
+
+
+                                }
+
+                                .header {
+                                    line-height: 1.1;
+                                    margin: 0mm !important;
+                                    font-size: 13px !important;
+                                }
+
+                                table {
+                                    border-collapse: collapse;
+                                    width: 99.9%;
+                                    font-size: 12px !important;
+                                    margin-top: 1mm !important;
+                                }
+
+                                th, td {
+                                    border: 1px solid #000;
+                                    padding: 0px !important;
+                                    margin: 2px !important;
+                                    text-align: left;
+                                    margin-left: 10mm !important;
+                                }
+
+                                th {
+
+                                }
+
+                                tfoot {
+                                    font-weight: 700 !important;
+                                    font-size: 11px !important;
+                                }
                             }
+                        </style>
 
-                            .paper {
-                                position: static !important;
-                                width: 297mm !important;
-
-
-                            }
-
-                            .header {
-                                line-height: 1.1;
-                                margin: 0mm !important;
-                                font-size: 13px !important;
-                            }
-
-                            table {
-                                border-collapse: collapse;
-                                width: 99.9%;
-                                font-size: 12px !important;
-                                margin-top: 1mm !important;
-                            }
-
-                            th, td {
-                                border: 1px solid #000;
-                                padding: 0px !important;
-                                margin: 2px !important;
-                                text-align: left;
-                                margin-left: 10mm !important;
-                            }
-
-                            th {
-
-                            }
-
-                            tfoot {
-                                font-weight: 700 !important;
-                                font-size: 11px !important;
-                            }
-                        }
-                    </style>
-
-                    <h:panelGroup id="reportView" class="d-flex justify-content-center">
-                        <div class="paper">
-                            <div class="header">
-                                <div class="d-flex justify-content-center text-5 gap-2"
-                                     style="font-weight: 700; font-size: 22px;margin-bottom: 5px;">
-                                    <h:outputText value="#{sessionController.institution.name}"/>
-                                </div>
-                                <div class="d-flex justify-content-center text-5 gap-2"
-                                     style="font-weight: 400; font-size: 20px;margin-bottom: 5px;">
-                                    <h:outputText value="Pharmacy Transfer Issue Bills"/>
-                                </div>
-                                <div class="d-flex justify-content-center text-5 gap-2"
-                                     style="font-weight: 600; font-size: 15px;margin-bottom: 5px;">
-                                    <h:outputText value="From - "/>
-                                    <h:outputText value="#{reportsTransfer.fromDepartment.name}"/>
-                                    <h:outputText value="" style="width: 2em!important;" class="text-center"/>
-                                    <h:outputText value="To - "/>
-                                    <h:outputText value="#{reportsTransfer.toDepartment.name}"/>
-                                </div>
-                                <div class="d-flex justify-content-center text-5 gap-2"
-                                     style="font-weight: 600; font-size: 15px;margin-bottom: 5px;">
-                                    <h:outputText value="From Date - "/>
-                                    <h:outputText value="#{reportsTransfer.fromDate}">
-                                        <f:convertDateTime
+                        <h:panelGroup id="reportView" class="d-flex justify-content-center">
+                            <div class="paper">
+                                <div class="header">
+                                    <div class="d-flex justify-content-center text-5 gap-2"
+                                         style="font-weight: 700; font-size: 22px;margin-bottom: 5px;">
+                                        <h:outputText value="#{sessionController.institution.name}"/>
+                                    </div>
+                                    <div class="d-flex justify-content-center text-5 gap-2"
+                                         style="font-weight: 400; font-size: 20px;margin-bottom: 5px;">
+                                        <h:outputText value="Pharmacy Transfer Issue Bills"/>
+                                    </div>
+                                    <div class="d-flex justify-content-center text-5 gap-2"
+                                         style="font-weight: 600; font-size: 15px;margin-bottom: 5px;">
+                                        <h:outputText value="From - "/>
+                                        <h:outputText value="#{reportsTransfer.fromDepartment.name}"/>
+                                        <h:outputText value="" style="width: 2em!important;" class="text-center"/>
+                                        <h:outputText value="To - "/>
+                                        <h:outputText value="#{reportsTransfer.toDepartment.name}"/>
+                                    </div>
+                                    <div class="d-flex justify-content-center text-5 gap-2"
+                                         style="font-weight: 600; font-size: 15px;margin-bottom: 5px;">
+                                        <h:outputText value="From Date - "/>
+                                        <h:outputText value="#{reportsTransfer.fromDate}">
+                                            <f:convertDateTime
                                                 pattern="#{sessionController.applicationPreference.longDateTimeFormat}"/>
-                                    </h:outputText>
-                                    <h:outputText value="" style="width: 2em!important;" class="text-center"/>
-                                    <h:outputText value="To Date - "/>
-                                    <h:outputText value="#{reportsTransfer.toDate}">
-                                        <f:convertDateTime
+                                        </h:outputText>
+                                        <h:outputText value="" style="width: 2em!important;" class="text-center"/>
+                                        <h:outputText value="To Date - "/>
+                                        <h:outputText value="#{reportsTransfer.toDate}">
+                                            <f:convertDateTime
                                                 pattern="#{sessionController.applicationPreference.longDateTimeFormat}"/>
-                                    </h:outputText>
+                                        </h:outputText>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div>
-                                <table style="width: 100%; border-collapse: collapse;">
-                                    <thead>
-                                    <tr>
-                                        <th style="text-align: left;">Bill No</th>
-                                        <th style="text-align: left;">Date/Time</th>
-                                        <th style="text-align: left;">Sent from</th>
-                                        <th style="text-align: left;">To be Received by</th>
-                                        <th style="text-align: left;">Transporter</th>
-                                        <th style="text-align: left;">Remarks</th>
-                                        <th style="text-align: right;">Purchase Value</th>
-                                        <th style="text-align: right;">Sale Value</th>
-                                        <th style="text-align: right;">Cost Value</th>
-                                        <th style="text-align: right;">Transfer Value</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <ui:repeat value="#{reportsTransfer.transferIssueDtos}" var="i">
-                                        <tr>
-                                            <td><h:outputText value="#{i.deptId}"/></td>
-                                            <td>
-                                                <h:outputText value="#{i.createdAt}">
-                                                    <f:convertDateTime
-                                                            pattern="#{sessionController.applicationPreference.shortDateTimeFormat}"/>
-                                                </h:outputText>
-                                            </td>
-                                            <td><h:outputText value="#{i.fromDepartment.name}"/></td>
-                                            <td><h:outputText value="#{i.toDepartment.name}"/></td>
-                                            <td><h:outputText value="#{i.toStaff.person.nameWithTitle}"/></td>
-                                            <td>
-                                                <h:panelGroup rendered="#{i.cancelled}">
-                                                    <h:outputText value="Cancelled "/>
-                                                    <h:outputLabel value="#{i.cancelledBill.deptId}"/>
+                                <div>
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <thead>
+                                            <tr>
+                                                <th style="text-align: left;">Bill No</th>
+                                                <th style="text-align: left;">Date/Time</th>
+                                                <th style="text-align: left;">Sent from</th>
+                                                <th style="text-align: left;">To be Received by</th>
+                                                <th style="text-align: left;">Transporter</th>
+                                                <th style="text-align: left;">Remarks</th>
+                                                <th style="text-align: right;">Purchase Value</th>
+                                                <th style="text-align: right;">Sale Value</th>
+                                                <h:panelGroup rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Disbursement Reports - Display Cost', true)}">
+                                                    <th style="text-align: right;">Cost Value</th>
                                                 </h:panelGroup>
-                                                <h:panelGroup rendered="#{i.refunded}">
-                                                    <h:outputText value="Returned"/>
+                                                <h:panelGroup rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Disbursement Reports - Display Transfer', true)}">
+                                                    <th style="text-align: right;">Transfer Value</th>
                                                 </h:panelGroup>
-                                            </td>
-                                            <td style="text-align: right;">
-                                                <h:outputLabel value="#{-i.purchaseValue}">
-                                                    <f:convertNumber pattern="#,##0.00"/>
-                                                </h:outputLabel>
-                                            </td>
-                                            <td style="text-align: right;">
-                                                <h:outputLabel value="#{-i.saleValue}">
-                                                    <f:convertNumber pattern="#,##0.00"/>
-                                                </h:outputLabel>
-                                            </td>
-                                            <td style="text-align: right;">
-                                                <h:outputLabel value="#{-i.costValueDouble}">
-                                                    <f:convertNumber pattern="#,##0.00"/>
-                                                </h:outputLabel>
-                                            </td>
-                                            <td style="text-align: right;">
-                                                <h:outputLabel value="#{-i.transferValueDouble}">
-                                                    <f:convertNumber pattern="#,##0.00"/>
-                                                </h:outputLabel>
-                                            </td>
-                                        </tr>
-                                    </ui:repeat>
-                                    </tbody>
-                                    <tfoot>
-                                    <tr>
-                                        <td colspan="6" style="text-align: left; font-weight: 700;">
-                                            <h:outputText value="Total"/>
-                                        </td>
-                                        <td style="text-align: right;">
-                                            <h:outputLabel value="#{-reportsTransfer.purchaseValue}">
-                                                <f:convertNumber pattern="#,##0.00"/>
-                                            </h:outputLabel>
-                                        </td>
-                                        <td style="text-align: right;">
-                                            <h:outputLabel value="#{-reportsTransfer.totalsValue}">
-                                                <f:convertNumber pattern="#,##0.00"/>
-                                            </h:outputLabel>
-                                        </td>
-                                        <td style="text-align: right;">
-                                            <h:outputLabel value="#{-reportsTransfer.totalCostValue}">
-                                                <f:convertNumber pattern="#,##0.00"/>
-                                            </h:outputLabel>
-                                        </td>
-                                        <td style="text-align: right;">
-                                            <h:outputLabel value="#{-reportsTransfer.totalTransferValue}">
-                                                <f:convertNumber pattern="#,##0.00"/>
-                                            </h:outputLabel>
-                                        </td>
-                                    </tr>
-                                    </tfoot>
-                                </table>
 
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <ui:repeat value="#{reportsTransfer.transferIssueDtos}" var="i">
+                                                <tr>
+                                                    <td><h:outputText value="#{i.deptId}"/></td>
+                                                    <td>
+                                                        <h:outputText value="#{i.createdAt}">
+                                                            <f:convertDateTime
+                                                                pattern="#{sessionController.applicationPreference.shortDateTimeFormat}"/>
+                                                        </h:outputText>
+                                                    </td>
+                                                    <td><h:outputText value="#{i.fromDepartment.name}"/></td>
+                                                    <td><h:outputText value="#{i.toDepartment.name}"/></td>
+                                                    <td><h:outputText value="#{i.toStaff.person.nameWithTitle}"/></td>
+                                                    <td>
+                                                        <h:panelGroup rendered="#{i.cancelled}">
+                                                            <h:outputText value="Cancelled "/>
+                                                            <h:outputLabel value="#{i.cancelledBill.deptId}"/>
+                                                        </h:panelGroup>
+                                                        <h:panelGroup rendered="#{i.refunded}">
+                                                            <h:outputText value="Returned"/>
+                                                        </h:panelGroup>
+                                                    </td>
+                                                    <td style="text-align: right;">
+                                                        <h:outputLabel value="#{-i.purchaseValue}">
+                                                            <f:convertNumber pattern="#,##0.00"/>
+                                                        </h:outputLabel>
+                                                    </td>
+                                                    <td style="text-align: right;">
+                                                        <h:outputLabel value="#{-i.saleValue}">
+                                                            <f:convertNumber pattern="#,##0.00"/>
+                                                        </h:outputLabel>
+                                                    </td>
+                                                    <h:panelGroup rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Disbursement Reports - Display Cost', true)}">
+                                                        <td style="text-align: right;">
+                                                            <h:outputLabel value="#{-i.costValueDouble}">
+                                                                <f:convertNumber pattern="#,##0.00"/>
+                                                            </h:outputLabel>
+                                                        </td>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Disbursement Reports - Display Transfer', true)}">
+                                                        <td style="text-align: right;">
+                                                            <h:outputLabel value="#{-i.transferValueDouble}">
+                                                                <f:convertNumber pattern="#,##0.00"/>
+                                                            </h:outputLabel>
+                                                        </td>
+                                                    </h:panelGroup>
+
+
+                                                </tr>
+                                            </ui:repeat>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="6" style="text-align: left; font-weight: 700;">
+                                                    <h:outputText value="Total"/>
+                                                </td>
+                                                <td style="text-align: right;">
+                                                    <h:outputLabel value="#{-reportsTransfer.purchaseValue}">
+                                                        <f:convertNumber pattern="#,##0.00"/>
+                                                    </h:outputLabel>
+                                                </td>
+                                                <td style="text-align: right;">
+                                                    <h:outputLabel value="#{-reportsTransfer.totalsValue}">
+                                                        <f:convertNumber pattern="#,##0.00"/>
+                                                    </h:outputLabel>
+                                                </td>
+                                                <h:panelGroup rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Disbursement Reports - Display Cost', true)}">
+                                                    <td style="text-align: right;">
+                                                        <h:outputLabel value="#{-reportsTransfer.totalCostValue}">
+                                                            <f:convertNumber pattern="#,##0.00"/>
+                                                        </h:outputLabel>
+                                                    </td>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup rendered="#{configOptionApplicationController.getBooleanValueByKey('Pharmacy Disbursement Reports - Display Transfer', true)}">
+                                                    <td style="text-align: right;">
+                                                        <h:outputLabel value="#{-reportsTransfer.totalTransferValue}">
+                                                            <f:convertNumber pattern="#,##0.00"/>
+                                                        </h:outputLabel>
+                                                    </td>
+                                                </h:panelGroup>
+
+
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+
+
+                                </div>
 
                             </div>
+                        </h:panelGroup>
 
-                        </div>
-                    </h:panelGroup>
+                    </p:panel>
+                </h:form>
+            </ui:define>
+        </ui:composition>
 
-                </p:panel>
-            </h:form>
-        </ui:define>
-    </ui:composition>
-
-</h:body>
+    </h:body>
 </html>

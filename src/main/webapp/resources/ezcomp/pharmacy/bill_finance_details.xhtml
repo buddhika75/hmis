@@ -33,7 +33,9 @@
         <h:panelGrid columns="2"  styleClass="w-100 m-1">
 
             <p:outputLabel value="Bill Expenses" />
-            <p:outputLabel value="#{cc.attrs.bill.billFinanceDetails.billExpense}" styleClass="text-end w-100" >
+            <p:outputLabel 
+                id="lblBillExpenses"
+                value="#{cc.attrs.bill.billFinanceDetails.billExpense}" styleClass="text-end w-100" >
                 <f:convertNumber pattern="#,##0.0000" ></f:convertNumber>
             </p:outputLabel>
 
@@ -43,7 +45,9 @@
             </p:outputLabel>
 
             <p:outputLabel value="Total Expense" />
-            <p:outputLabel value="#{cc.attrs.bill.billFinanceDetails.totalExpense}" styleClass="text-end w-100" >
+            <p:outputLabel
+                id="lblTotalExpenses"
+                value="#{cc.attrs.bill.billFinanceDetails.totalExpense}" styleClass="text-end w-100" >
                 <f:convertNumber pattern="#,##0.0000" ></f:convertNumber>
             </p:outputLabel>
 

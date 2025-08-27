@@ -1,0 +1,125 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/resources/template/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+        <h:form>
+            <p:panel style="min-width: 100%;">
+                <f:facet name="header">
+                    <h:outputText styleClass="fas fa-check-circle"/>
+                    <h:outputLabel class="mx-4" value="GRN List - To Approve"/>
+                </f:facet>
+
+                <div class="row">
+                    <div class="col-2">
+                        <h:outputLabel value="From Date"/>
+                        <p:calendar 
+                            id="fromDate" 
+                            class="w-100"
+                            inputStyleClass="form-control"
+                            value="#{searchController.fromDate}" 
+                            navigator="false" 
+                            pattern="#{sessionController.applicationPreference.longDateTimeFormat}">      
+                        </p:calendar>
+                        <h:outputLabel value="To Date"/>
+                        <p:calendar 
+                            id="toDate"
+                            class="w-100"
+                            inputStyleClass="form-control"
+                            value="#{searchController.toDate}" 
+                            navigator="false" 
+                            pattern="#{sessionController.applicationPreference.longDateTimeFormat}">                                                                              
+                        </p:calendar>
+                        <h:outputLabel value="GRN Number" class="mt-2"/>
+                        <p:inputText autocomplete="off" class="w-100" value="#{searchController.searchKeyword.billNo}" />
+                        <h:outputLabel value="Distributor"/>   
+                        <p:inputText autocomplete="off" class="w-100" value="#{searchController.searchKeyword.toInstitution}" />  
+                        <h:outputLabel value="GRN Value"/>
+                        <p:inputText autocomplete="off" class="w-100" value="#{searchController.searchKeyword.netTotal}" />
+                        <h:outputLabel value="Item Name"/>
+                        <p:inputText autocomplete="off" class="w-100" value="#{searchController.searchKeyword.itemName}"/>
+                        <p:commandButton 
+                            class="w-100 mt-3 ui-button-success" 
+                            icon="fas fa-search"
+                            id="btnSearch" 
+                            ajax="false" 
+                            value="Search" 
+                            action="#{searchController.createGrnTableToApprove}"/>  
+                    </div>
+                    <div class="col-10">
+                        <p:dataTable 
+                            value="#{searchController.bills}" 
+                            var="g"
+                            paginator="true"
+                            rows="10"
+                            paginatorPosition="bottom"
+                            paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                            rowsPerPageTemplate="5,10,15">
+
+                            <p:column headerText="Completed On" width="8em">
+                                <h:outputLabel value="#{g.createdAt}">
+                                    <f:convertDateTime timeZone="Asia/Colombo" pattern="#{sessionController.applicationPreference.shortDateFormat}" />
+                                </h:outputLabel>
+                            </p:column> 
+
+                            <p:column headerText="Department" width="6em">
+                                <h:outputLabel value="#{g.fromDepartment.name}"/>
+                            </p:column>
+
+                            <p:column headerText="Completed By" width="8em">
+                                <h:outputLabel value="#{g.creater.webUserPerson.name}"/>
+                            </p:column>    
+
+                            <p:column headerText="Distributor" width="12em">
+                                <h:outputLabel value="#{g.toInstitution.name}"/>
+                            </p:column>
+
+                            <p:column headerText="GRN Number" width="8em">                   
+                                <h:outputLabel value="#{g.deptId}"/>
+                            </p:column>              
+
+                            <p:column headerText="GRN Value" width="8em" class="text-end">
+                                <h:outputLabel value="#{g.netTotal}">
+                                    <f:convertNumber pattern="#,##0.00" />
+                                </h:outputLabel>
+                            </p:column>
+
+                            <p:column headerText="Related PO" width="8em">
+                                <h:outputLabel value="#{g.referenceBill.deptId}" rendered="#{g.referenceBill ne null}"/>
+                            </p:column>
+
+                            <p:column headerText="Actions" width="8em">
+                                <div class="d-flex gap-1">
+                                    <p:commandButton  
+                                        class="ui-button-warning"  
+                                        icon="fa fa-edit"
+                                        title="Edit and Finalize GRN" 
+                                        ajax="false"
+                                        rendered="#{!configOptionApplicationController.getBooleanValueByKey('Manage Costing', true)}"
+                                        action="#{pharmacyBillSearch.navigateToEditSavedGrn()}">
+                                        <f:setPropertyActionListener target="#{pharmacyBillSearch.bill}" value="#{g}"/>
+                                    </p:commandButton>
+                                    <p:commandButton  
+                                        class="ui-button-warning"  
+                                        icon="fa fa-edit"
+                                        title="Edit and Finalize GRN with Costing" 
+                                        ajax="false"
+                                        rendered="#{configOptionApplicationController.getBooleanValueByKey('Manage Costing', true)}"
+                                        action="#{pharmacyBillSearch.navigateToEditSavedGrnCosting()}">
+                                        <f:setPropertyActionListener target="#{pharmacyBillSearch.bill}" value="#{g}"/>
+                                    </p:commandButton>
+
+                                </div>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </div>
+            </p:panel>
+        </h:form>
+    </ui:define>  
+
+</ui:composition>

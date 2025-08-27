@@ -13,12 +13,14 @@
                             <p:panel header="Manage Financial Activities">
                                 <p:accordionPanel activeIndex="#{viewScopeDataTransferController.manageFeeIndex}">
                                     <p:ajax process="@this"></p:ajax>
-                                    <p:tab title="Fees">
+                                    <p:tab 
+                                        id="tabIndividualFeeManagement"
+                                        title="Individual Fee Management">
                                         <div class="d-grid gap-2">
                                             <p:commandButton 
                                                 class="w-100"
                                                 ajax="false" 
-                                                value="Base Item Fees"
+                                                value="Base Fees"
                                                 icon="fa fa-cog" 
                                                 actionListener="#{viewScopeDataTransferController.makeAdminFeesAsPreviousPage()}"
                                                 action="#{itemFeeManager.navigateToItemFees()}">
@@ -27,7 +29,7 @@
                                             <p:commandButton
                                                 class="w-100"
                                                 ajax="false"
-                                                value="Item Fees for Departments"
+                                                value="Departments Fees"
                                                 icon="fa fa-sitemap"
                                                 action="#{itemFeeManager.navigateToForDepartmentItemFees()}">
                                             </p:commandButton>
@@ -35,7 +37,7 @@
                                             <p:commandButton
                                                 class="w-100"
                                                 ajax="false"
-                                                value="Item Fees for Sites"
+                                                value="Sites Fees"
                                                 icon="fa fa-building"
                                                 action="#{itemFeeManager.navigateToForSiteItemFees()}">
                                             </p:commandButton>
@@ -43,7 +45,7 @@
                                             <p:commandButton 
                                                 class="w-100"
                                                 ajax="false" 
-                                                value="Item Fees for Collecting Centres"
+                                                value="Collection Centre Fees"
                                                 icon="fa fa-map-marker" 
                                                 action="#{itemFeeManager.navigateToCollectingCentreItemFees()}">
                                             </p:commandButton>
@@ -51,18 +53,13 @@
                                             <p:commandButton 
                                                 class="w-100"
                                                 ajax="false" 
-                                                value="Item Fees for Lists"
+                                                value="List Fees"
                                                 icon="fa fa-file-alt" 
                                                 action="#{itemFeeManager.navigateToFeeListFees()}">
                                             </p:commandButton>
 
 
-                                            <p:commandButton
-                                                class="w-100"
-                                                ajax="false" 
-                                                value="Manage Base Item Fees - Multiple"
-                                                action="#{itemFeeManager.navigateToItemFeesMultiple()}">
-                                            </p:commandButton>
+
 
 
 
@@ -70,12 +67,26 @@
                                         </div>
                                     </p:tab>
 
-                                    <p:tab title="Lists">
+                                    <p:tab 
+                                        id="tabMetadata"
+                                        title="Manage Metadata">
                                         <div class="d-grid gap-2">
                                             <p:commandButton 
                                                 class="w-100"
                                                 ajax="false" 
-                                                value="Base Item Fees"
+                                                value="Lists Fees"
+                                                icon="fa fa-list" 
+                                                action="#{categoryController.navigateToManageFeeListTypes()}">
+                                            </p:commandButton>
+                                        </div>
+                                    </p:tab>
+
+                                    <p:tab title="Manage Multiple Fees">
+                                        <div class="d-grid gap-2">
+                                            <p:commandButton 
+                                                class="w-100"
+                                                ajax="false" 
+                                                value="Base Fees"
                                                 icon="fa fa-list" 
                                                 action="#{itemFeeManager.navigateToDownloadBaseItemFees()}">
                                             </p:commandButton>
@@ -83,23 +94,17 @@
                                             <p:commandButton 
                                                 class="w-100"
                                                 ajax="false" 
-                                                value="Item Fees for Sites"
+                                                value="Sites Fees"
                                                 icon="fa fa-sitemap" 
                                                 action="#{itemFeeManager.navigateToDownloadItemFeesForSites()}">
                                             </p:commandButton>
 
-                                            <p:commandButton 
-                                                class="w-100"
-                                                ajax="false" 
-                                                value="Fee Lists"
-                                                icon="fa fa-list" 
-                                                action="#{categoryController.navigateToManageFeeListTypes()}">
-                                            </p:commandButton>
+
 
                                             <p:commandButton 
                                                 class="w-100"
                                                 ajax="false" 
-                                                value="Item Fees for Collecting Centres"
+                                                value="Collecting Centres Fees"
                                                 icon="fa fa-map-pin" 
                                                 action="#{itemFeeManager.navigateToDownloadItemFeesForCollectingCentres()}">
                                             </p:commandButton>
@@ -141,68 +146,98 @@
                                                 action="#{itemFeeManager.navigateToCollectingCentreItemFeeList}">
                                             </p:commandButton>
 
+                                            <p:separator></p:separator>
+
+                                            <p:commandButton 
+                                                class="w-100 ui-button-danger"
+                                                ajax="false"
+                                                value="Retire ALL Collecting Centre Item Fees"
+                                                icon="fa fa-times-circle"
+                                                action="#{itemFeeManager.navigateToRetireAllCollectingCentreItemFees}">
+                                            </p:commandButton>
+
+                                            <p:commandButton 
+                                                class="w-100 ui-button-info"
+                                                ajax="false"
+                                                value="Assign Fee Lists to Collecting Centres"
+                                                icon="fa fa-list-check"
+                                                action="#{itemFeeManager.navigateToAssignFeeListsToCollectingCentres}">
+                                            </p:commandButton>
+
+
+                                            <!--                                            
+                                                                                        Need to Fix or Remove this in a separate issue
+                                                                                        <p:commandButton
+                                                                                            class="w-100"
+                                                                                            ajax="false" 
+                                                                                            value="Manage Base Item Fees - Multiple"
+                                                                                            action="#{itemFeeManager.navigateToItemFeesMultiple()}">
+                                                                                        </p:commandButton>
+                                            
+                                            -->
 
                                         </div>
                                     </p:tab>
 
-                                    <p:tab title="Upload Fees">
+                                    <p:tab id="tblUpload" title="Upload Fees">
                                         <div class="d-grid gap-2">
-                                            <p:commandButton 
-                                                class="w-100"
-                                                ajax="false" 
-                                                value="Upload to replace Site Fees by Item Code"
-                                                icon="fa fa-list" 
-                                                action="#{itemFeeManager.navigateToUploadToReplaceSiteFeesByItemCode()}">
-                                            </p:commandButton>
+
                                             <p:commandButton
-                                                class="w-100"
+                                                class="w-100 ui-button-success"
                                                 ajax="false"
-                                                value="Upload to add Site Fees by Item Code"
+                                                value="Add Site Fees"
                                                 icon="fa fa-list"
                                                 action="#{itemFeeManager.navigateToUploadToAddSiteFeesByItemCode()}">
                                             </p:commandButton>
                                             <p:commandButton
-                                                class="w-100"
+                                                class="w-100 ui-button-success"
                                                 ajax="false"
-                                                value="Upload to add Department Fees by Item Code"
+                                                value="Add Department Fees"
                                                 icon="fa fa-list"
                                                 action="#{itemFeeManager.navigateToUploadToAddDepartmentFeesByItemCode()}">
                                             </p:commandButton>
                                             <p:commandButton 
-                                                class="w-100"
+                                                class="w-100 ui-button-success"
                                                 ajax="false" 
-                                                value="Upload to add Collection Centre Fees by Item Code"
+                                                value="Add Collection Centre Fees"
                                                 icon="fa fa-list" 
                                                 action="#{itemFeeManager.navigateToUploadToAddCcFeesByItemCode()}">
                                             </p:commandButton>
                                             <p:commandButton 
-                                                class="w-100"
+                                                class="w-100 ui-button-success"
                                                 ajax="false"
-                                                value="Upload Item Fees"
-                                                action="#{itemFeeManager.navigateToUploadItemFees()}">
-                                            </p:commandButton>
-
-                                            <p:commandButton 
-                                                class="w-100"
-                                                ajax="false"
-                                                value="Upload fee list types"
-                                                action="#{itemFeeManager.navigateToUploadFeeListType()}">
-                                            </p:commandButton>
-
-                                            <p:commandButton 
-                                                class="w-100"
-                                                ajax="false"
-                                                value="Upload Institution Item Fees"
+                                                value="Add Collection Centre Item Fees"
                                                 action="#{itemFeeManager.navigateToUploadCollectingCentreFeeList()}">
                                             </p:commandButton>
-
-
                                             <p:commandButton 
-                                                class="w-100"
+                                                class="w-100 ui-button-success"
                                                 ajax="false"
                                                 value="Upload fee list Item Fees"
                                                 action="#{itemFeeManager.navigateToUploadFeeListItemFees}">
                                             </p:commandButton>
+                                            <p:separator ></p:separator>
+                                            <p:commandButton 
+                                                class="w-100 ui-button-warning"
+                                                ajax="false"
+                                                value="Replace Item Fees"
+                                                action="#{itemFeeManager.navigateToUploadAndReplaceItemFees()}">
+                                            </p:commandButton>
+                                            <p:commandButton 
+                                                class="w-100 ui-button-warning"
+                                                ajax="false" 
+                                                value="Replace Site Fees"
+                                                icon="fa fa-list" 
+                                                action="#{itemFeeManager.navigateToUploadToReplaceSiteFeesByItemCode()}">
+                                            </p:commandButton>
+
+                                            <p:commandButton 
+                                                class="w-100 ui-button-warning"
+                                                ajax="false"
+                                                value="Replace List Fees"
+                                                action="#{itemFeeManager.navigateToUploadAndReplaceListFees()}">
+                                            </p:commandButton>
+
+
 
                                             <p:commandButton 
                                                 class="w-100"
@@ -222,7 +257,7 @@
                                                 class="w-100"
                                                 ajax="false"
                                                 value="Upload Collecting Centre Item Fees"
-                                                action="#{itemFeeManager.navigateToUploadItemFees()}">
+                                                action="#{itemFeeManager.navigateToUploadAndReplaceItemFees()}">
                                             </p:commandButton>
 
                                             <p:commandButton 

@@ -103,12 +103,13 @@
                       rowKey="#{i.id}" 
                       rowIndexVar="s"
                       rows="20"
+                      selectionMode="multiple"
                       paginator="true"
                       paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                       rowsPerPageTemplate="20,50,100,500,1000,1500"
                       >
 
-            <p:column  selectionMode="multiple" exportable="false" style="width: 10px;"> 
+            <p:column selectionBox="true" exportable="false" style="width: 10px;"> 
 
             </p:column>
 

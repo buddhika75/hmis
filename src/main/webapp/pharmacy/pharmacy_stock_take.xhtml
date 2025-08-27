@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head />
+    <h:body>
+        <ui:composition template="/forms/index.xhtml">
+            <ui:define name="subcontent">
+                <div class="container-fluid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Pharmacy Stock Take</h2>
+                        </div>
+                        <div class="card-body">
+                            <h:form>
+                                <p:commandButton value="Take Snapshot" action="#{pharmacyStockTakeController.captureSnapshot}" update="@form" icon="fa fa-camera"/>
+                                <p:commandButton value="Reset Session" action="#{pharmacyStockTakeController.resetStockTakingSession}" update="@form" icon="fa fa-refresh" styleClass="ui-button-secondary" rendered="#{pharmacyStockTakeController.snapshotBill ne null}"/>
+                                <p:commandButton value="Download Guided Sheet" ajax="false" styleClass="ui-button-success" icon="fa fa-download" rendered="#{pharmacyStockTakeController.snapshotBill ne null}" onclick="PrimeFaces.monitorDownload(start, stop);">
+                                    <p:fileDownload value="#{pharmacyStockTakeController.downloadGuidedSheet}" />
+                                </p:commandButton>
+                                <p:commandButton value="Download Blind Sheet" ajax="false" styleClass="ui-button-secondary" icon="fa fa-download" rendered="#{pharmacyStockTakeController.snapshotBill ne null}" onclick="PrimeFaces.monitorDownload(start, stop);">
+                                    <p:fileDownload value="#{pharmacyStockTakeController.downloadBlindSheet}" />
+                                </p:commandButton>
+                                <p:separator/> 
+                                <p:fileUpload value="#{pharmacyStockTakeController.file}" mode="simple" rendered="#{pharmacyStockTakeController.snapshotBill ne null}"/>
+                                <p:commandButton value="Upload Sheet" action="#{pharmacyStockTakeController.parseUploadedSheet}" update="@form" icon="fa fa-upload" rendered="#{pharmacyStockTakeController.snapshotBill ne null}"/>
+                                <p:commandButton value="Save Physical Count" action="#{pharmacyStockTakeController.savePhysicalCount}" update="@form" icon="fa fa-save" rendered="#{pharmacyStockTakeController.physicalCountBill ne null and pharmacyStockTakeController.physicalCountBill.id eq null}"/>
+                                
+                                <p:separator rendered="#{pharmacyStockTakeController.physicalCountBill ne null and pharmacyStockTakeController.physicalCountBill.id ne null and pharmacyStockTakeController.physicalCountBill.approveUser eq null}"/>
+                                <h:panelGroup rendered="#{pharmacyStockTakeController.physicalCountBill ne null and pharmacyStockTakeController.physicalCountBill.id ne null and pharmacyStockTakeController.physicalCountBill.approveUser eq null}">
+                                    <p:commandButton value="Approve Physical Count" action="#{pharmacyStockTakeController.approvePhysicalCount}" update="@form" icon="fa fa-check" styleClass="ui-button-success"/>
+                                    <p:commandButton value="Reject Physical Count" action="#{pharmacyStockTakeController.rejectPhysicalCount}" update="@form" icon="fa fa-times" styleClass="ui-button-danger"/>
+                                </h:panelGroup>
+                                
+                                <h:panelGroup rendered="#{pharmacyStockTakeController.physicalCountBill ne null and pharmacyStockTakeController.physicalCountBill.approveUser ne null}">
+                                    <p:outputText value="Status: " style="font-weight:bold"/>
+                                    <p:outputText value="#{pharmacyStockTakeController.physicalCountBill.cancelled ? 'Rejected' : 'Approved'}" 
+                                                  style="color:#{pharmacyStockTakeController.physicalCountBill.cancelled ? 'red' : 'green'}; font-weight:bold"/>
+                                    <p:outputText value=" by #{pharmacyStockTakeController.physicalCountBill.approveUser.webUserPerson.name}" style="font-weight:bold"/>
+                                    <p:outputText value=" on #{pharmacyStockTakeController.physicalCountBill.approveAt}">
+                                        <f:convertDateTime pattern="#{sessionController.applicationPreference.longDateTimeFormat}"/>
+                                    </p:outputText>
+                                </h:panelGroup>
+                                
+                                <p:dataTable value="#{pharmacyStockTakeController.physicalCountBill.billItems}" var="bi" rendered="#{pharmacyStockTakeController.physicalCountBill ne null}">
+                                    <p:column headerText="Item">
+                                        <h:outputText value="#{bi.item.name}"/>
+                                    </p:column>
+                                    <p:column headerText="Snapshot Qty" style="text-align:right">
+                                        <h:outputText value="#{bi.referanceBillItem.qty}">
+                                            <f:convertNumber integerOnly="true"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="Physical Qty" style="text-align:right">
+                                        <h:outputText value="#{bi.qty}">
+                                            <f:convertNumber integerOnly="true"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="Variance" style="text-align:right">
+                                        <h:outputText value="#{bi.adjustedValue}">
+                                            <f:convertNumber integerOnly="true"/>
+                                        </h:outputText>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>

@@ -245,6 +245,11 @@
                                     <f:convertNumber pattern="#,##0" />
                                 </h:outputText>
                             </p:column>
+                            <p:column headerText="FREE QTY">
+                                <h:outputText value="#{bi.pharmaceuticalBillItem.freeQty}" >
+                                    <f:convertNumber pattern="#,##0" />
+                                </h:outputText>
+                            </p:column>
                             <p:column headerText="COST RATE" width="5em">
                                 <h:outputText value="#{bi.pharmaceuticalBillItem.itemBatch.costRate}" >
                                     <f:convertNumber pattern="#,##0.00" />

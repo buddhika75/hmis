@@ -16,6 +16,7 @@ import com.divudi.ejb.BillNumberGenerator;
 import com.divudi.ejb.PharmacyBean;
 import com.divudi.core.entity.Bill;
 import com.divudi.core.entity.BillItem;
+import com.divudi.core.entity.BillItemFinanceDetails;
 import com.divudi.core.entity.BilledBill;
 import com.divudi.core.entity.pharmacy.PharmaceuticalBillItem;
 import com.divudi.core.facade.BillFacade;
@@ -27,6 +28,7 @@ import com.divudi.ejb.EmailManagerEjb;
 import com.divudi.core.entity.AppEmail;
 import com.divudi.core.data.MessageType;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -36,6 +38,8 @@ import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.model.LazyDataModel;
+import com.divudi.core.entity.pharmacy.Ampp;
+import com.divudi.core.entity.pharmacy.Amp;
 
 /**
  *
@@ -209,9 +213,165 @@ public class PurchaseOrderController implements Serializable {
     @Inject
     private PharmacyController pharmacyController;
 
-    public void onEdit(BillItem tmp) {
-        tmp.setNetValue(tmp.getPharmaceuticalBillItem().getQty() * tmp.getPharmaceuticalBillItem().getPurchaseRate());
-        calTotal();
+    public void onEdit(BillItem bi) {
+        // During approving, only recalculate if BillItemFinanceDetails is missing or incomplete
+        // This prevents unnecessary recalculations when data is already correct from request phase
+        if (bi.getBillItemFinanceDetails() == null || 
+            bi.getBillItemFinanceDetails().getLineNetTotal() == null ||
+            bi.getBillItemFinanceDetails().getQuantity() == null ||
+            bi.getBillItemFinanceDetails().getLineGrossRate() == null) {
+            calculateLineValues(bi);
+        } else {
+            // Just ensure the values are synchronized for user changes
+            updateCalculatedValues(bi);
+        }
+        calculateBillTotals();
+    }
+
+    private void updateCalculatedValues(BillItem lineBillItem) {
+        // Quick update without full recalculation - just synchronize user input
+        BigDecimal bdQty = lineBillItem.getBillItemFinanceDetails().getQuantity();
+        BigDecimal bdFreeQty = lineBillItem.getBillItemFinanceDetails().getFreeQuantity();
+        BigDecimal bdPurchaseRate = lineBillItem.getBillItemFinanceDetails().getLineGrossRate();
+
+        if (bdQty == null) bdQty = BigDecimal.ZERO;
+        if (bdFreeQty == null) bdFreeQty = BigDecimal.ZERO;
+        if (bdPurchaseRate == null) bdPurchaseRate = BigDecimal.ZERO;
+
+        // Recalculate only the essential values that depend on user input
+        BigDecimal bdGrossValue = bdPurchaseRate.multiply(bdQty);
+        BigDecimal bdNetValue = bdGrossValue;
+        
+        lineBillItem.getBillItemFinanceDetails().setLineNetTotal(bdNetValue);
+        lineBillItem.getBillItemFinanceDetails().setLineGrossTotal(bdGrossValue);
+        lineBillItem.setNetValue(bdNetValue.doubleValue());
+
+        // Update PharmaceuticalBillItem values
+        double quantity = bdQty.doubleValue();
+        double freeQuantity = bdFreeQty.doubleValue();
+
+        if (lineBillItem.getItem() instanceof Ampp) {
+            BigDecimal unitsPerPackDecimal = lineBillItem.getBillItemFinanceDetails().getUnitsPerPack();
+            double unitsPerPack = (unitsPerPackDecimal == null || unitsPerPackDecimal.doubleValue() == 0) ? 1.0 : unitsPerPackDecimal.doubleValue();
+
+            lineBillItem.getPharmaceuticalBillItem().setQty(quantity * unitsPerPack);
+            lineBillItem.getPharmaceuticalBillItem().setFreeQty(freeQuantity * unitsPerPack);
+            lineBillItem.getPharmaceuticalBillItem().setPurchaseRate(bdPurchaseRate.doubleValue() / unitsPerPack);
+            lineBillItem.getPharmaceuticalBillItem().setPurchaseRatePack(bdPurchaseRate.doubleValue());
+        } else {
+            lineBillItem.getPharmaceuticalBillItem().setQty(quantity);
+            lineBillItem.getPharmaceuticalBillItem().setFreeQty(freeQuantity);
+            lineBillItem.getPharmaceuticalBillItem().setPurchaseRate(bdPurchaseRate.doubleValue());
+            lineBillItem.getPharmaceuticalBillItem().setPurchaseRatePack(bdPurchaseRate.doubleValue());
+        }
+    }
+
+    public void calculateLineValues(BillItem lineBillItem) {
+
+        BigDecimal bdQty = lineBillItem.getBillItemFinanceDetails().getQuantity(); // User Input Captured 
+        BigDecimal bdFreeQty = lineBillItem.getBillItemFinanceDetails().getFreeQuantity(); // User input captured
+        BigDecimal bdPurchaseRate = lineBillItem.getBillItemFinanceDetails().getLineGrossRate(); // User input captured
+        BigDecimal bdRetailRate = lineBillItem.getBillItemFinanceDetails().getRetailSaleRate(); // User input captured
+        BigDecimal bdUnitsPerPack = lineBillItem.getBillItemFinanceDetails().getUnitsPerPack(); // Taken at Item Add
+
+        // Null safety checks
+        if (bdQty == null) {
+            bdQty = BigDecimal.ZERO;
+        }
+        if (bdFreeQty == null) {
+            bdFreeQty = BigDecimal.ZERO;
+        }
+        if (bdPurchaseRate == null) {
+            bdPurchaseRate = BigDecimal.ZERO;
+        }
+        if (bdRetailRate == null) {
+            bdRetailRate = BigDecimal.ZERO;
+        }
+        if (bdUnitsPerPack == null || bdUnitsPerPack.doubleValue() == 0) {
+            bdUnitsPerPack = BigDecimal.ONE;
+        }
+
+        // Calculate values for BillItemFinanceDetails
+        BigDecimal bdGrossValue = bdPurchaseRate.multiply(bdQty); // purchase rate * quantity
+        BigDecimal bdNetValue = bdGrossValue; // assign gross value as no discount here
+        BigDecimal bdRetailValue = bdRetailRate.multiply(bdQty.add(bdFreeQty)); // retail rate * (qty + free qty)
+        BigDecimal bdPurchaseValue = bdPurchaseRate.multiply(bdQty.add(bdFreeQty)); // purchase rate * (qty + free qty)
+
+        // Assign calculated values for BillItemFinanceDetails
+        // Since discounts, tax, expenses are zero: net rate = gross rate, net value = gross value
+        lineBillItem.getBillItemFinanceDetails().setLineNetRate(bdPurchaseRate);
+        lineBillItem.getBillItemFinanceDetails().setLineGrossRate(bdPurchaseRate);
+        lineBillItem.getBillItemFinanceDetails().setGrossRate(bdPurchaseRate);
+
+        lineBillItem.getBillItemFinanceDetails().setLineNetTotal(bdNetValue);
+        lineBillItem.getBillItemFinanceDetails().setLineGrossTotal(bdGrossValue);
+        lineBillItem.getBillItemFinanceDetails().setGrossTotal(bdGrossValue);
+
+        lineBillItem.getBillItemFinanceDetails().setQuantity(bdQty);
+        lineBillItem.getBillItemFinanceDetails().setFreeQuantity(bdFreeQty);
+        
+        // Calculate quantity by units (for AMPP items)
+        BigDecimal quantityByUnits;
+        if (lineBillItem.getItem() instanceof Ampp) {
+            quantityByUnits = bdQty.multiply(bdUnitsPerPack);
+        } else {
+            quantityByUnits = bdQty;
+        }
+        lineBillItem.getBillItemFinanceDetails().setQuantityByUnits(quantityByUnits);
+
+        lineBillItem.getBillItemFinanceDetails().setValueAtPurchaseRate(bdPurchaseValue);
+        lineBillItem.getBillItemFinanceDetails().setValueAtRetailRate(bdRetailValue);
+        
+        // Set costing values to zero (not relevant for purchase orders)
+        lineBillItem.getBillItemFinanceDetails().setLineCost(BigDecimal.ZERO);
+        lineBillItem.getBillItemFinanceDetails().setLineCostRate(BigDecimal.ZERO);
+        lineBillItem.getBillItemFinanceDetails().setValueAtCostRate(BigDecimal.ZERO);
+        
+        // Set audit fields for BillItemFinanceDetails
+        if (lineBillItem.getBillItemFinanceDetails().getId() == null) {
+            lineBillItem.getBillItemFinanceDetails().setCreatedAt(new Date());
+            // Note: BillItemFinanceDetails may not have setCreater method, skip if not available
+        }
+
+        // Set audit fields for PharmaceuticalBillItem (set if null, regardless of ID)
+        if (lineBillItem.getPharmaceuticalBillItem().getCreatedAt() == null) {
+            lineBillItem.getPharmaceuticalBillItem().setCreatedAt(new Date());
+        }
+        if (lineBillItem.getPharmaceuticalBillItem().getCreater() == null) {
+            lineBillItem.getPharmaceuticalBillItem().setCreater(sessionController.getLoggedUser());
+        }
+
+        // Set audit fields for BillItem
+        if (lineBillItem.getId() == null) {
+            lineBillItem.setCreatedAt(new Date());
+            lineBillItem.setCreater(sessionController.getLoggedUser());
+        }
+
+        // Update pharmaceuticalBillItem quantities and rates
+        double quantity = bdQty.doubleValue();
+        double freeQuantity = bdFreeQty.doubleValue();
+        double unitsPerPack = bdUnitsPerPack.doubleValue();
+
+        if (lineBillItem.getItem() instanceof Ampp) {
+            // For AMPP items, billItemFinanceDetails stores packs, convert to units
+            lineBillItem.getPharmaceuticalBillItem().setQty(quantity * unitsPerPack);
+            lineBillItem.getPharmaceuticalBillItem().setFreeQty(freeQuantity * unitsPerPack);
+
+            lineBillItem.getPharmaceuticalBillItem().setPurchaseRate(bdPurchaseRate.doubleValue() / unitsPerPack);
+            lineBillItem.getPharmaceuticalBillItem().setPurchaseRatePack(bdPurchaseRate.doubleValue());
+            lineBillItem.getPharmaceuticalBillItem().setPurchaseValue(bdPurchaseValue.doubleValue());
+        } else {
+            // For AMP items, billItemFinanceDetails and pharmaceuticalBillItem use same units
+            lineBillItem.getPharmaceuticalBillItem().setQty(quantity);
+            lineBillItem.getPharmaceuticalBillItem().setFreeQty(freeQuantity);
+
+            lineBillItem.getPharmaceuticalBillItem().setPurchaseRate(bdPurchaseRate.doubleValue());
+            lineBillItem.getPharmaceuticalBillItem().setPurchaseRatePack(bdPurchaseRate.doubleValue()); // For AMP, rate per pack = rate per unit
+            lineBillItem.getPharmaceuticalBillItem().setPurchaseValue(bdPurchaseValue.doubleValue());
+        }
+
+        // Set netValue for legacy compatibility
+        lineBillItem.setNetValue(bdNetValue.doubleValue());
     }
 
     public void onFocus(BillItem ph) {
@@ -320,18 +480,77 @@ public class PurchaseOrderController implements Serializable {
 
             PharmaceuticalBillItem ph = new PharmaceuticalBillItem();
             ph.setBillItem(bi);
+            
+            // Set audit fields for the new PharmaceuticalBillItem
+            ph.setCreatedAt(new Date());
+            ph.setCreater(sessionController.getLoggedUser());
 
             ph.setFreeQty(i.getFreeQty());
             ph.setQty(i.getQty());
             ph.setPurchaseRate(i.getPurchaseRate());
+            ph.setPurchaseRatePack(i.getPurchaseRatePack());
             ph.setRetailRate(i.getRetailRate());
+            ph.setPurchaseValue(i.getPurchaseValue());
             bi.setPharmaceuticalBillItem(ph);
-//            bi.setTmpQty(ph.getQty());
+
+            // Create a new BillItemFinanceDetails instance and copy values from the original request
+            if (i.getBillItem().getBillItemFinanceDetails() != null) {
+                BillItemFinanceDetails originalBifd = i.getBillItem().getBillItemFinanceDetails();
+                BillItemFinanceDetails newBifd = bi.getBillItemFinanceDetails();
+                
+                // Copy all values from original to new instance
+                newBifd.setUnitsPerPack(originalBifd.getUnitsPerPack());
+                newBifd.setLineGrossRate(originalBifd.getLineGrossRate());
+                newBifd.setBillGrossRate(originalBifd.getBillGrossRate());
+                newBifd.setGrossRate(originalBifd.getGrossRate());
+                newBifd.setLineNetRate(originalBifd.getLineNetRate());
+                newBifd.setBillNetRate(originalBifd.getBillNetRate());
+                newBifd.setNetRate(originalBifd.getNetRate());
+                newBifd.setLineDiscountRate(originalBifd.getLineDiscountRate());
+                newBifd.setBillDiscountRate(originalBifd.getBillDiscountRate());
+                newBifd.setTotalDiscountRate(originalBifd.getTotalDiscountRate());
+                newBifd.setLineExpenseRate(originalBifd.getLineExpenseRate());
+                newBifd.setBillExpenseRate(originalBifd.getBillExpenseRate());
+                newBifd.setTotalExpenseRate(originalBifd.getTotalExpenseRate());
+                newBifd.setBillTaxRate(originalBifd.getBillTaxRate());
+                newBifd.setLineTaxRate(originalBifd.getLineTaxRate());
+                newBifd.setTotalTaxRate(originalBifd.getTotalTaxRate());
+                newBifd.setBillCostRate(originalBifd.getBillCostRate());
+                newBifd.setLineCostRate(originalBifd.getLineCostRate());
+                newBifd.setTotalCostRate(originalBifd.getTotalCostRate());
+                newBifd.setLineGrossTotal(originalBifd.getLineGrossTotal());
+                newBifd.setBillGrossTotal(originalBifd.getBillGrossTotal());
+                newBifd.setGrossTotal(originalBifd.getGrossTotal());
+                newBifd.setLineNetTotal(originalBifd.getLineNetTotal());
+                newBifd.setBillNetTotal(originalBifd.getBillNetTotal());
+                newBifd.setNetTotal(originalBifd.getNetTotal());
+                newBifd.setQuantity(originalBifd.getQuantity());
+                newBifd.setFreeQuantity(originalBifd.getFreeQuantity());
+                newBifd.setQuantityByUnits(originalBifd.getQuantityByUnits());
+                newBifd.setLineCost(originalBifd.getLineCost());
+                newBifd.setLineCostRate(originalBifd.getLineCostRate());
+                newBifd.setValueAtCostRate(originalBifd.getValueAtCostRate());
+                newBifd.setValueAtPurchaseRate(originalBifd.getValueAtPurchaseRate());
+                newBifd.setValueAtRetailRate(originalBifd.getValueAtRetailRate());
+                newBifd.setRetailSaleRate(originalBifd.getRetailSaleRate());
+                newBifd.setWholesaleRate(originalBifd.getWholesaleRate());
+                
+                // Set the new instance (this will automatically set the bidirectional relationship)
+                bi.setBillItemFinanceDetails(newBifd);
+            }
+
+            // Set the netValue from BillItemFinanceDetails for display compatibility
+            if (bi.getBillItemFinanceDetails() != null && bi.getBillItemFinanceDetails().getLineNetTotal() != null) {
+                bi.setNetValue(bi.getBillItemFinanceDetails().getLineNetTotal().doubleValue());
+            } else {
+                // Fallback to legacy calculation if BillItemFinanceDetails is missing
+                bi.setNetValue(ph.getQty() * ph.getPurchaseRate());
+            }
 
             getBillItems().add(bi);
         }
 
-        calTotal();
+        calculateBillTotals();
 
     }
 
@@ -399,15 +618,59 @@ public class PurchaseOrderController implements Serializable {
         this.pharmacyBean = pharmacyBean;
     }
 
-    public void calTotal() {
-        double tmp = 0;
+    public void calculateBillTotals() {
+        BigDecimal billNetTotal = BigDecimal.ZERO;
+        BigDecimal billGrossTotal = BigDecimal.ZERO;
+        BigDecimal totalPurchaseValueFree = BigDecimal.ZERO;
+        BigDecimal totalPurchaseValueNonFree = BigDecimal.ZERO;
+        BigDecimal totalRetailSaleValueFree = BigDecimal.ZERO;
+        BigDecimal totalRetailSaleValueNonFree = BigDecimal.ZERO;
         int serialNo = 0;
-        for (BillItem bi : getBillItems()) {
-            tmp += bi.getPharmaceuticalBillItem().getQty() * bi.getPharmaceuticalBillItem().getPurchaseRate();
-            bi.setSearialNo(serialNo++);
+
+        for (BillItem handlingBillItem : getBillItems()) {
+            if (handlingBillItem == null || handlingBillItem.isRetired()) {
+                continue;
+            }
+
+            // Set serial number
+            handlingBillItem.setSearialNo(serialNo++);
+
+            // Collect totals from BillItemFinanceDetails
+            if (handlingBillItem.getBillItemFinanceDetails() != null) {
+                BigDecimal lineNetTotal = handlingBillItem.getBillItemFinanceDetails().getLineNetTotal();
+                BigDecimal lineGrossTotal = handlingBillItem.getBillItemFinanceDetails().getLineGrossTotal();
+                BigDecimal purchaseValue = handlingBillItem.getBillItemFinanceDetails().getValueAtPurchaseRate();
+                BigDecimal retailValue = handlingBillItem.getBillItemFinanceDetails().getValueAtRetailRate();
+
+                if (lineNetTotal != null) {
+                    billNetTotal = billNetTotal.add(lineNetTotal);
+                }
+                if (lineGrossTotal != null) {
+                    billGrossTotal = billGrossTotal.add(lineGrossTotal);
+                }
+                if (purchaseValue != null) {
+                    totalPurchaseValueNonFree = totalPurchaseValueNonFree.add(purchaseValue);
+                }
+                if (retailValue != null) {
+                    totalRetailSaleValueNonFree = totalRetailSaleValueNonFree.add(retailValue);
+                }
+            }
+
+            // Set the netValue for display compatibility
+            if (handlingBillItem.getBillItemFinanceDetails() != null && 
+                handlingBillItem.getBillItemFinanceDetails().getLineNetTotal() != null) {
+                handlingBillItem.setNetValue(handlingBillItem.getBillItemFinanceDetails().getLineNetTotal().doubleValue());
+            }
         }
-        getAprovedBill().setTotal(tmp);
-        getAprovedBill().setNetTotal(tmp);
+
+        // Update bill totals
+        getAprovedBill().setTotal(billGrossTotal.doubleValue());
+        getAprovedBill().setNetTotal(billNetTotal.doubleValue());
+    }
+
+    // Maintain backward compatibility
+    public void calTotal() {
+        calculateBillTotals();
     }
 
     public void setToDate(Date toDate) {

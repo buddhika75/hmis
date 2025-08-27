@@ -1,0 +1,133 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:body>
+        <ui:composition template="/pharmacy/pharmacy_analytics.xhtml">
+            <ui:define name="subcontent">
+                <h:form>
+                    <p:panel header="Stock Adjustment Variance">
+                        <h:panelGrid columns="8" class="w-100">
+                            <h:panelGroup layout="block" styleClass="form-group">
+                                <h:outputText value="&#xf073;" styleClass="fa mr-2" />
+                                <p:outputLabel value="From Date" for="fromDate" class="m-3" />
+                            </h:panelGroup>
+                            <p:calendar id="fromDate" styleClass="w-100" inputStyleClass="w-100 form-control"
+                                        value="#{pharmacyAdjustmentReportController.fromDate}"
+                                        pattern="#{sessionController.applicationPreference.longDateTimeFormat}" />
+
+                            <p:spacer width="20" />
+
+                            <h:panelGroup layout="block" styleClass="form-group">
+                                <h:outputText value="&#xf073;" styleClass="fa mr-2" />
+                                <p:outputLabel value="To Date" for="toDate" class="m-3" />
+                            </h:panelGroup>
+                            <p:calendar id="toDate" styleClass="w-100" inputStyleClass="w-100 form-control"
+                                        value="#{pharmacyAdjustmentReportController.toDate}"
+                                        pattern="#{sessionController.applicationPreference.longDateTimeFormat}" />
+
+                            <p:spacer width="20" />
+                            <p:spacer width="20" />
+                            <p:spacer width="20" />
+
+                            <h:panelGroup layout="block" styleClass="form-group">
+                                <h:outputText styleClass="fa fa-university mr-2" />
+                                <p:outputLabel value="Institution" for="phmIns" class="m-3" />
+                            </h:panelGroup>
+                            <p:selectOneMenu id="phmIns" class="w-100" value="#{pharmacyAdjustmentReportController.institution}" filter="true">
+                                <f:selectItem itemLabel="All Institutions" />
+                                <f:selectItems value="#{institutionController.companies}" var="ins" itemLabel="#{ins.name}" itemValue="#{ins}" />
+                                <p:ajax process="phmIns" update="phmDept" />
+                            </p:selectOneMenu>
+
+                            <p:spacer width="20" />
+
+                            <h:panelGroup layout="block" styleClass="form-group">
+                                <h:outputText styleClass="fa fa-map-marker-alt mr-2" />
+                                <p:outputLabel value="Site" for="phmSite" class="m-3" />
+                            </h:panelGroup>
+                            <p:selectOneMenu id="phmSite" class="w-100" value="#{pharmacyAdjustmentReportController.site}" filter="true">
+                                <f:selectItem itemLabel="All Sites" />
+                                <f:selectItems value="#{institutionController.sites}" var="site" itemLabel="#{site.name}" itemValue="#{site}" />
+                                <p:ajax process="phmSite" update="phmDept" />
+                            </p:selectOneMenu>
+
+                            <p:spacer width="20" />
+
+                            <h:panelGroup layout="block" styleClass="form-group">
+                                <h:outputText styleClass="fa fa-building mr-2" />
+                                <p:outputLabel value="Department" for="phmDept" class="m-3" />
+                            </h:panelGroup>
+                            <h:panelGroup id="phmDept">
+                                <p:selectOneMenu rendered="#{pharmacyAdjustmentReportController.institution eq null and pharmacyAdjustmentReportController.site eq null}" styleClass="w-100 form-control" value="#{pharmacyAdjustmentReportController.department}" filterMatchMode="contains" filter="true">
+                                    <f:selectItem itemLabel="All Departments" />
+                                    <f:selectItems value="#{departmentController.getDepartmentsOfInstitutionAndSite()}" var="dept" itemLabel="#{dept.name}" itemValue="#{dept}" />
+                                </p:selectOneMenu>
+                                <p:selectOneMenu rendered="#{pharmacyAdjustmentReportController.institution eq null and pharmacyAdjustmentReportController.site ne null}" styleClass="w-100 form-control" value="#{pharmacyAdjustmentReportController.department}" filterMatchMode="contains" filter="true">
+                                    <f:selectItem itemLabel="All Departments" />
+                                    <f:selectItems value="#{departmentController.getDepartmentsOfInstitutionAndSite(pharmacyAdjustmentReportController.site)}" var="dept" itemLabel="#{dept.name}" itemValue="#{dept}" />
+                                </p:selectOneMenu>
+                                <p:selectOneMenu rendered="#{pharmacyAdjustmentReportController.institution ne null and pharmacyAdjustmentReportController.site eq null}" styleClass="w-100 form-control" value="#{pharmacyAdjustmentReportController.department}" filterMatchMode="contains" filter="true">
+                                    <f:selectItem itemLabel="All Departments" />
+                                    <f:selectItems value="#{departmentController.getDepartmentsOfInstitutionAndSite(pharmacyAdjustmentReportController.institution)}" var="dept" itemLabel="#{dept.name}" itemValue="#{dept}" />
+                                </p:selectOneMenu>
+                                <p:selectOneMenu rendered="#{pharmacyAdjustmentReportController.institution ne null and pharmacyAdjustmentReportController.site ne null}" styleClass="w-100 form-control" value="#{pharmacyAdjustmentReportController.department}" filterMatchMode="contains" filter="true">
+                                    <f:selectItem itemLabel="All Departments" />
+                                    <f:selectItems value="#{departmentController.getDepartmentsOfInstitutionAndSite(pharmacyAdjustmentReportController.institution, pharmacyAdjustmentReportController.site)}" var="dept" itemLabel="#{dept.name}" itemValue="#{dept}" />
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </h:panelGrid>
+                        <br/>
+                        <div class="d-flex align-items-center">
+                            <p:commandButton class="ui-button-warning mx-1" icon="fas fa-cogs" ajax="false" value="Process" action="#{pharmacyAdjustmentReportController.createAdjustmentReport}" />
+                            <p:commandButton class="ui-button mx-1" icon="fas fa-print" ajax="false" value="Print All" onclick="hidePaginatorBeforePrint()">
+                                <p:printer target="tbl1" />
+                            </p:commandButton>
+                            <p:commandButton class="ui-button-success mx-1" icon="fas fa-file-excel" ajax="false" value="Excel" action="#{pharmacyAdjustmentReportController.exportToExcel}" />
+                            <p:commandButton class="ui-button-danger mx-1" icon="fas fa-file-pdf" ajax="false" value="PDF" action="#{pharmacyAdjustmentReportController.exportToPdf}" />
+                        </div>
+                        <p:dataTable id="tbl1" value="#{pharmacyAdjustmentReportController.stockCorrectionRows}" var="item" paginator="true" rows="20">
+                            <p:column headerText="Item">
+                                <h:outputText value="#{item.itemName}" />
+                            </p:column>
+                            <p:column headerText="Qty">
+                                <h:outputText value="#{item.qty}" />
+                            </p:column>
+                            <p:column headerText="Old Rate">
+                                <h:outputText value="#{item.oldRate}" />
+                            </p:column>
+                            <p:column headerText="Old Value">
+                                <h:outputText value="#{item.oldValue}" />
+                            </p:column>
+                            <p:column headerText="New Rate">
+                                <h:outputText value="#{item.newRate}" />
+                            </p:column>
+                            <p:column headerText="New Value">
+                                <h:outputText value="#{item.newValue}" />
+                            </p:column>
+                            <p:column headerText="Variance">
+                                <h:outputText value="#{item.variance}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                    <h:outputScript>
+                        function hidePaginatorBeforePrint() {
+                            let paginators = document.querySelectorAll('.ui-paginator');
+                            paginators.forEach(el => el.style.display = 'none');
+                        }
+                        function restorePaginatorAfterPrint() {
+                            let paginators = document.querySelectorAll('.ui-paginator');
+                            paginators.forEach(el => el.style.display = '');
+                        }
+                        window.onafterprint = function () {
+                            restorePaginatorAfterPrint();
+                        }
+                    </h:outputScript>
+                </h:form>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>

@@ -50,7 +50,15 @@
       "Bash(gh pr view:*)",
       "Bash(gh issue comment:*)",
       "Bash(gh issue close:*)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(gh workflow run:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh pr merge:*)",
+      "Read(/D:\\tmp/**)",
+      "Read(/D:\\c/**)",
+      "Bash(gh workflow:*)"
+      "Read(/D:\\c/**)"
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

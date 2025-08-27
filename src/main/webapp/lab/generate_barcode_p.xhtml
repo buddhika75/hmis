@@ -243,48 +243,48 @@
                                             <p:commandLink 
                                                 ajax="false" 
                                                 class="m-2 text-primary"
-                                                value="#{patientInvestigation.billItem.bill.deptId}" 
                                                 action="#{billSearch.navigateToViewOpdBill()}">
                                                 <f:setPropertyActionListener value="#{patientInvestigation.billItem.bill}" target="#{billSearch.bill}"/>
                                                 <i class="fas fa-receipt"></i> <!-- Bill Icon -->
+                                                <h:outputLabel value="#{patientInvestigation.billItem.bill.deptId}" class="mx-2"/>
                                             </p:commandLink>
                                             <br/>
                                             <i class="fas fa-calendar-alt text-secondary"></i> <!-- Date Icon -->
-                                            <h:outputLabel value="#{patientInvestigation.billItem.bill.createdAt}">
+                                            <h:outputLabel class="mx-2" value="#{patientInvestigation.billItem.bill.createdAt}">
                                                 <f:convertDateTime pattern="#{sessionController.applicationPreference.longDateTimeFormat}"></f:convertDateTime>
                                             </h:outputLabel>
                                             <br/>
                                             <!-- CC, IP, and OP Icons with Colours -->
                                             <h:panelGroup rendered="#{patientInvestigation.billItem.bill.ipOpOrCc == 'CC'}">
                                                 <i class="fas fa-box text-warning"></i> <!-- Collecting Centre Icon -->
-                                                <h:outputLabel value="Collecting Centre (CC)" class="text-warning"/>
+                                                <h:outputLabel value="Collecting Centre (CC)" class="mx-2 text-warning"/>
                                             </h:panelGroup>
                                             <h:panelGroup rendered="#{patientInvestigation.billItem.bill.ipOpOrCc == 'IP'}">
                                                 <i class="fas fa-procedures text-info"></i> <!-- Inpatient Icon -->
-                                                <h:outputLabel value="Inpatient (IP)" class="text-info"/>
+                                                <h:outputLabel value="Inpatient (IP)" class="mx-2 text-info"/>
                                             </h:panelGroup>
                                             <h:panelGroup rendered="#{patientInvestigation.billItem.bill.ipOpOrCc == 'OP'}">
                                                 <i class="fas fa-user-outlet text-primary"></i> <!-- Outpatient Icon -->
-                                                <h:outputLabel value="Outpatient (OP)" class="text-primary"/>
+                                                <h:outputLabel value="Outpatient (OP)" class="mx-2 text-primary"/>
                                             </h:panelGroup>
                                         </p:column>
 
                                         <!-- Patient Details Column with Icons -->
                                         <p:column headerText="Patient" style="width: 10em; vertical-align: top;">
                                             <i class="fas fa-user text-primary"></i> <!-- Name Icon -->
-                                            <h:outputLabel value="#{patientInvestigation.billItem.bill.patient.person.nameWithTitle}" />
+                                            <h:outputLabel class="mx-2" value="#{patientInvestigation.billItem.bill.patient.person.nameWithTitle}" />
                                             <br/>
                                             <i class="fas fa-birthday-cake text-info"></i> <!-- Age Icon -->
-                                            <h:outputLabel value="#{patientInvestigation.billItem.bill.patient.person.ageAsString}" />
+                                            <h:outputLabel class="mx-2" value="#{patientInvestigation.billItem.bill.patient.person.ageAsString}" />
                                             <br/>
                                             <i class="fas fa-venus-mars text-danger"></i> <!-- Sex Icon -->
-                                            <h:outputLabel value="#{patientInvestigation.billItem.bill.patient.person.sex.label}" />
+                                            <h:outputLabel class="mx-2" value="#{patientInvestigation.billItem.bill.patient.person.sex.label}" />
                                             <br/>
                                             <i class="fas fa-phone-alt text-success"></i> <!-- Phone Icon -->
-                                            <h:outputLabel value="#{patientInvestigation.billItem.bill.patient.person.phone}" />
+                                            <h:outputLabel class="mx-2" value="#{patientInvestigation.billItem.bill.patient.person.phone}" />
                                             <br/>
                                             <i class="fas fa-mobile-alt text-warning"></i> <!-- Mobile Icon -->
-                                            <h:outputLabel value="#{patientInvestigation.billItem.bill.patient.person.mobile}" />
+                                            <h:outputLabel class="mx-2" value="#{patientInvestigation.billItem.bill.patient.person.mobile}" />
                                         </p:column>
 
                                         <!-- Investigation Name Column -->
@@ -350,9 +350,9 @@
                                         <p:column headerText="Samples" style="width: 5em; vertical-align: top;">
                                             <ui:repeat value="#{patientInvestigationController.getPatientSampleComponentsByInvestigation(patientInvestigation)}" var="psc">
                                                 <div class="ui-g d-grid" style="margin-bottom: 10px;">
-                                                    <div class="ui-g-6">
-                                                        <i class="fa fa-vial"></i>
-                                                        <h:outputText value="#{psc.patientSample.id}" class="text-primary" />
+                                                    <div class="d-flex gap-3">
+                                                        <i class="#{psc.patientSample.sampleRejected ? 'text-danger fa fa-vial mt-2 ' : 'text-primary fa fa-vial mt-2 '}"></i>
+                                                        <h:outputText value="#{psc.patientSample.id}" class="#{psc.patientSample.sampleRejected ? 'text-danger' : 'text-primary'}" />
                                                     </div>
                                                 </div>
                                             </ui:repeat>
@@ -528,53 +528,53 @@
                                         <p:column headerText="Bill No." width="10em" style="width: 8em; vertical-align: top;">
                                             <p:commandLink 
                                                 ajax="false" 
-                                                class="m-2 text-primary"
-                                                value="#{b.deptId}" 
+                                                class="text-primary"
                                                 action="#{billSearch.navigateToViewOpdBill()}">
                                                 <f:setPropertyActionListener value="#{b}" target="#{billSearch.bill}"/>
                                                 <i class="fas fa-receipt"></i> <!-- Bill Icon -->
+                                                <h:outputLabel value="#{b.deptId}" class="mx-2"/>
                                             </p:commandLink>
                                             <br/>
                                             <i class="fas fa-calendar-alt text-secondary"></i> <!-- Date Icon -->
-                                            <h:outputLabel value="#{b.createdAt}">
+                                            <h:outputLabel value="#{b.createdAt}" class="mx-2" >
                                                 <f:convertDateTime pattern="#{sessionController.applicationPreference.longDateTimeFormat}"></f:convertDateTime>
                                             </h:outputLabel>
                                             <br/>
                                             <i class="fa-solid fa-file-invoice-dollar text-secondary"></i> <!-- Bill ID Icon -->
-                                            <h:outputLabel value="#{b.id}">
+                                            <h:outputLabel value="#{b.id}" class="mx-2" >
                                             </h:outputLabel>
                                             <br/>
                                             <!-- CC, IP, and OP Icons with Colours -->
                                             <h:panelGroup rendered="#{b.ipOpOrCc == 'CC'}">
                                                 <i class="fas fa-box text-warning"></i> <!-- Collecting Centre Icon -->
-                                                <h:outputLabel value="Collecting Centre (CC)" class="text-warning"/>
+                                                <h:outputLabel value="Collecting Centre (CC)" class="text-warning mx-2"/>
                                             </h:panelGroup>
                                             <h:panelGroup rendered="#{b.ipOpOrCc == 'IP'}">
                                                 <i class="fas fa-procedures text-info"></i> <!-- Inpatient Icon -->
-                                                <h:outputLabel value="Inpatient (IP)" class="text-info"/>
+                                                <h:outputLabel value="Inpatient (IP)" class="text-info mx-2"/>
                                             </h:panelGroup>
                                             <h:panelGroup rendered="#{b.ipOpOrCc == 'OP'}">
                                                 <i class="fas fa-user-outlet text-primary"></i> <!-- Outpatient Icon -->
-                                                <h:outputLabel value="Outpatient (OP)" class="text-primary"/>
+                                                <h:outputLabel value="Outpatient (OP)" class="text-primary mx-2"/>
                                             </h:panelGroup>
                                         </p:column>
 
                                         <!-- Patient Details Column with Icons -->
                                         <p:column headerText="Patient"  style="width: 10em; vertical-align: top;">
                                             <i class="fas fa-user text-primary"></i> <!-- Name Icon -->
-                                            <h:outputLabel value="#{b.patient.person.nameWithTitle}" />
+                                            <h:outputLabel value="#{b.patient.person.nameWithTitle}" class="mx-2" />
                                             <br/>
                                             <i class="fas fa-birthday-cake text-info"></i> <!-- Age Icon -->
-                                            <h:outputLabel value="#{b.patient.person.ageAsString}" />
+                                            <h:outputLabel value="#{b.patient.person.ageAsString}" class="mx-2"/>
                                             <br/>
                                             <i class="fas fa-venus-mars text-danger"></i> <!-- Sex Icon -->
-                                            <h:outputLabel value="#{b.patient.person.sex.label}" />
+                                            <h:outputLabel value="#{b.patient.person.sex.label}" class="mx-2" />
                                             <br/>
                                             <i class="fas fa-phone-alt text-success"></i> <!-- Phone Icon -->
-                                            <h:outputLabel value="#{b.patient.person.phone}" />
+                                            <h:outputLabel value="#{b.patient.person.phone}" class="mx-2" />
                                             <br/>
                                             <i class="fas fa-mobile-alt text-warning"></i> <!-- Mobile Icon -->
-                                            <h:outputLabel value="#{b.patient.person.mobile}" />
+                                            <h:outputLabel value="#{b.patient.person.mobile}" class="mx-2" />
                                         </p:column>
 
                                         <!-- Ordered Institution and Department Column -->
@@ -940,49 +940,49 @@
                                         <p:column headerText="Bill" width="6em" style="vertical-align: top;">
                                             <p:commandLink 
                                                 ajax="false" 
-                                                class="m-2 text-primary"
-                                                value="#{ps.bill.id}" 
+                                                class="text-primary"
                                                 action="#{billSearch.navigateToViewOpdBill()}">
                                                 <f:setPropertyActionListener value="#{ps.bill}" target="#{billSearch.bill}"/>
-                                                <i class="fas fa-receipt"></i> <!-- Bill Icon -->
+                                                <i class="fas fa-receipt"></i><!-- Bill Icon -->
+                                                <h:outputLabel class="mx-2" value="#{ps.bill.deptId}"/>
                                             </p:commandLink>
                                             <br/>
                                             <i class="fas fa-calendar-alt text-secondary"></i> <!-- Date Icon -->
-                                            <h:outputLabel value="#{ps.bill.createdAt}">
+                                            <h:outputLabel value="#{ps.bill.createdAt}" class="mx-2">
                                                 <f:convertDateTime pattern="#{sessionController.applicationPreference.longDateTimeFormat}"></f:convertDateTime>
                                             </h:outputLabel>
                                             <br/>
                                             <!-- CC, IP, and OP Icons with Colours -->
                                             <h:panelGroup rendered="#{ps.bill.ipOpOrCc == 'CC'}">
                                                 <i class="fas fa-box text-warning"></i> <!-- Collecting Centre Icon -->
-                                                <h:outputLabel value="Collecting Centre (CC)" class="text-warning"/>
+                                                <h:outputLabel value="Collecting Centre (CC)" class="mx-2 text-warning"/>
                                             </h:panelGroup>
                                             <h:panelGroup rendered="#{ps.bill.ipOpOrCc == 'IP'}">
                                                 <i class="fas fa-procedures text-info"></i> <!-- Inpatient Icon -->
-                                                <h:outputLabel value="Inpatient (IP)" class="text-info"/>
+                                                <h:outputLabel value="Inpatient (IP)" class="text-info mx-2 "/>
                                             </h:panelGroup>
                                             <h:panelGroup rendered="#{ps.bill.ipOpOrCc == 'OP'}">
                                                 <i class="fas fa-user-outlet text-primary"></i> <!-- Outpatient Icon -->
-                                                <h:outputLabel value="Outpatient (OP)" class="text-primary"/>
+                                                <h:outputLabel value="Outpatient (OP)" class="mx-2 text-primary"/>
                                             </h:panelGroup>
                                         </p:column>
 
                                         <!-- Patient Details Column with Icons -->
                                         <p:column headerText="Patient" width="10em" style="vertical-align: top;">
                                             <i class="fas fa-user text-primary"></i> <!-- Name Icon -->
-                                            <h:outputLabel value="#{ps.bill.patient.person.nameWithTitle}" />
+                                            <h:outputLabel class="mx-2" value="#{ps.bill.patient.person.nameWithTitle}" />
                                             <br/>
                                             <i class="fas fa-birthday-cake text-info"></i> <!-- Age Icon -->
-                                            <h:outputLabel value="#{ps.bill.patient.person.ageAsString}" />
+                                            <h:outputLabel class="mx-2" value="#{ps.bill.patient.person.ageAsString}" />
                                             <br/>
                                             <i class="fas fa-venus-mars text-danger"></i> <!-- Sex Icon -->
-                                            <h:outputLabel value="#{ps.bill.patient.person.sex.label}" />
+                                            <h:outputLabel class="mx-2" value="#{ps.bill.patient.person.sex.label}" />
                                             <br/>
                                             <i class="fas fa-phone-alt text-success"></i> <!-- Phone Icon -->
-                                            <h:outputLabel value="#{ps.bill.patient.person.phone}" />
+                                            <h:outputLabel class="mx-2" value="#{ps.bill.patient.person.phone}" />
                                             <br/>
                                             <i class="fas fa-mobile-alt text-warning"></i> <!-- Mobile Icon -->
-                                            <h:outputLabel value="#{ps.bill.patient.person.mobile}" />
+                                            <h:outputLabel class="mx-2" value="#{ps.bill.patient.person.mobile}" />
                                         </p:column>
 
                                         <!-- Status Column with Badge -->
@@ -1001,7 +1001,8 @@
                                             </h:panelGroup>
 
                                             <h:panelGroup rendered="#{!ps.bill.cancelled}">
-                                                <h:outputLabel value=" #{ps.status}" />
+                                                <h:outputLabel value=" #{ps.status}" /><br/>
+                                                <p:badge value="Request Re-Collect" styleClass="ui-badge-warning" rendered="#{ps.requestReCollected}"/>
                                             </h:panelGroup>
 
                                         </p:column>
@@ -1109,49 +1110,49 @@
                                         <p:column headerText="Bill Number" width="12em" style="vertical-align: top;">
                                             <p:commandLink 
                                                 ajax="false" 
-                                                class="m-2 text-primary"
-                                                value="#{dpr.patientInvestigation.billItem.bill.deptId}" 
+                                                class="m-2 text-primary" 
                                                 action="#{billSearch.navigateToViewOpdBill()}">
                                                 <f:setPropertyActionListener value="#{dpr.patientInvestigation.billItem.bill}" target="#{billSearch.bill}"/>
                                                 <i class="fas fa-receipt"></i> <!-- Bill Icon -->
+                                                <h:outputLabel value="#{dpr.patientInvestigation.billItem.bill.deptId}" class="mx-2"/>
                                             </p:commandLink>
                                             <br/>
                                             <i class="fas fa-calendar-alt text-secondary"></i> <!-- Date Icon -->
-                                            <h:outputLabel value="#{dpr.patientInvestigation.billItem.bill.createdAt}">
+                                            <h:outputLabel value="#{dpr.patientInvestigation.billItem.bill.createdAt}" class="mx-2">
                                                 <f:convertDateTime pattern="#{sessionController.applicationPreference.longDateTimeFormat}"></f:convertDateTime>
                                             </h:outputLabel>
                                             <br/>
                                             <!-- CC, IP, and OP Icons with Colours -->
                                             <h:panelGroup rendered="#{dpr.patientInvestigation.billItem.bill.ipOpOrCc == 'CC'}">
                                                 <i class="fas fa-box text-warning"></i> <!-- Collecting Centre Icon -->
-                                                <h:outputLabel value="Collecting Centre (CC)" class="text-warning"/>
+                                                <h:outputLabel value="Collecting Centre (CC)" class="text-warning mx-2"/>
                                             </h:panelGroup>
                                             <h:panelGroup rendered="#{dpr.patientInvestigation.billItem.bill.ipOpOrCc == 'IP'}">
                                                 <i class="fas fa-procedures text-info"></i> <!-- Inpatient Icon -->
-                                                <h:outputLabel value="Inpatient (IP)" class="text-info"/>
+                                                <h:outputLabel value="Inpatient (IP)" class="text-info mx-2"/>
                                             </h:panelGroup>
                                             <h:panelGroup rendered="#{dpr.patientInvestigation.billItem.bill.ipOpOrCc == 'OP'}">
                                                 <i class="fas fa-user-outlet text-primary"></i> <!-- Outpatient Icon -->
-                                                <h:outputLabel value="Outpatient (OP)" class="text-primary"/>
+                                                <h:outputLabel value="Outpatient (OP)" class="text-primary mx-2"/>
                                             </h:panelGroup>
                                         </p:column>
 
                                         <!-- Patient Details Column with Icons -->
                                         <p:column headerText="Patient" width="10em" style="vertical-align: top;">
                                             <i class="fas fa-user text-primary"></i> <!-- Name Icon -->
-                                            <h:outputLabel value="#{dpr.patientInvestigation.billItem.bill.patient.person.nameWithTitle}" />
+                                            <h:outputLabel value="#{dpr.patientInvestigation.billItem.bill.patient.person.nameWithTitle}" class="mx-2"/>
                                             <br/>
                                             <i class="fas fa-birthday-cake text-info"></i> <!-- Age Icon -->
-                                            <h:outputLabel value="#{dpr.patientInvestigation.billItem.bill.patient.person.ageAsString}" />
+                                            <h:outputLabel value="#{dpr.patientInvestigation.billItem.bill.patient.person.ageAsString}" class="mx-2" />
                                             <br/>
                                             <i class="fas fa-venus-mars text-danger"></i> <!-- Sex Icon -->
-                                            <h:outputLabel value="#{dpr.patientInvestigation.billItem.bill.patient.person.sex.label}" />
+                                            <h:outputLabel value="#{dpr.patientInvestigation.billItem.bill.patient.person.sex.label}" class="mx-2" />
                                             <br/>
                                             <i class="fas fa-phone-alt text-success"></i> <!-- Phone Icon -->
-                                            <h:outputLabel value="#{dpr.patientInvestigation.billItem.bill.patient.person.phone}" />
+                                            <h:outputLabel value="#{dpr.patientInvestigation.billItem.bill.patient.person.phone}" class="mx-2" />
                                             <br/>
                                             <i class="fas fa-mobile-alt text-warning"></i> <!-- Mobile Icon -->
-                                            <h:outputLabel value="#{dpr.patientInvestigation.billItem.bill.patient.person.mobile}" />
+                                            <h:outputLabel value="#{dpr.patientInvestigation.billItem.bill.patient.person.mobile}" class="mx-2" />
                                         </p:column>
 
                                         <!-- Investigation Name Column -->
@@ -1218,13 +1219,13 @@
                                                 <div class="ui-g" style="margin-bottom: 10px;">
                                                     <div class="ui-g-12">
                                                         <i class="fa fa-vial text-primary"></i>
-                                                        <span class="text-primary font-weight-bold">Sample ID:</span>
-                                                        <h:outputText value="#{psc.patientSample.id}" class="text-primary" />
+                                                        <span class="text-primary font-weight-bold">Sample ID : </span>
+                                                        <h:outputText value="#{psc.patientSample.id}" class="text-primary mx-2" />
                                                     </div>
                                                     <div class="ui-g-12">
                                                         <i class="fa fa-flask text-success"></i>
-                                                        <span class="text-success font-weight-bold">Test Component:</span>
-                                                        <h:outputText value="#{psc.investigationComponant.name}" class="text-success" />
+                                                        <span class="text-success font-weight-bold">Test Component : </span>
+                                                        <h:outputText value="#{psc.investigationComponant.name}" class="text-success mx-2" />
                                                     </div>
                                                 </div>
                                             </ui:repeat>
@@ -1345,6 +1346,19 @@
                                 <h:panelGrid columns="1" class="w-100">
 
                                     <hr/>
+                                    
+                                    <p:commandButton 
+                                        disabled="#{patientInvestigationController.listingEntity ne 'PATIENT_SAMPLES'}"
+                                        id="btnCreateSamples"
+                                        value="Re-Generate Samples"
+                                        ajax="false"
+                                        action="#{patientInvestigationController.reGenerateSampleForRejectSamples()}"
+                                        title="Re-Generate Samples"
+                                        icon="pi pi-plus-circle"
+                                        styleClass="m-1  w-100 ui-button-success" >
+                                    </p:commandButton>
+                                    
+                                    <hr/>
 
                                     <p:commandButton 
                                         rendered="#{patientInvestigationController.listingEntity eq 'PATIENT_INVESTIGATIONS'}"
@@ -1448,6 +1462,12 @@
                                         class="w-100"
                                         value="#{patientInvestigationController.sampleRejectionComment}" >
                                     </p:inputText>
+                                    
+                                    <h:panelGrid columns="3" class="my-2">
+                                        <p:toggleSwitch value="#{patientInvestigationController.requestReCollected}" onIcon="pi pi-check" offIcon="pi pi-times" />
+                                        <p:spacer width="20"/>
+                                        <h:outputLabel value="Request Re-Collect Sample" />
+                                    </h:panelGrid>
 
                                     <p:commandButton 
                                         disabled="#{patientInvestigationController.listingEntity ne 'PATIENT_SAMPLES'}"

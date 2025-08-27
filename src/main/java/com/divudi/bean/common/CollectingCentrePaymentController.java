@@ -94,6 +94,7 @@ public class CollectingCentrePaymentController implements Serializable {
     private List<Bill> paymentBills;
 
     private String billNumber;
+    private String comment;
 
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Navigation Method">
@@ -184,6 +185,7 @@ public class CollectingCentrePaymentController implements Serializable {
         types.add(HistoryType.CollectingCentreDepositCancel);
         types.add(HistoryType.CollectingCentreCreditNote);
         types.add(HistoryType.RepaymentToCollectingCentre);
+        types.add(HistoryType.RepaymentToCollectingCentreCancel);
 
         String jpql = "select ah "
                 + " from AgentHistory ah "
@@ -215,6 +217,7 @@ public class CollectingCentrePaymentController implements Serializable {
         types.add(HistoryType.CollectingCentreDepositCancel);
         types.add(HistoryType.CollectingCentreCreditNote);
         types.add(HistoryType.RepaymentToCollectingCentre);
+        types.add(HistoryType.RepaymentToCollectingCentreCancel);
 
         String jpql = "select ah "
                 + " from AgentHistory ah "
@@ -286,7 +289,7 @@ public class CollectingCentrePaymentController implements Serializable {
                         bl.setCcTotal(-originalBill.getTotalCenterFee());
                         bl.setHospitalTotal(-originalBill.getTotalHospitalFee());
                     }
-                    
+
                 } else {
                     BillLight bill = bills.get(0);
                     bl.setReferenceNumber(bill.getReferenceNumber());
@@ -392,9 +395,9 @@ public class CollectingCentrePaymentController implements Serializable {
         ccAgentPaymentBill.setBillTime(new Date());
 
         ccAgentPaymentBill.setBillTypeAtomic(BillTypeAtomic.CC_AGENT_PAYMENT);
-        ccAgentPaymentBill.setNetTotal(payingTotalCCAmount);
-        ccAgentPaymentBill.setTotal(payingTotalCCAmount);
-        ccAgentPaymentBill.setPaidAmount(payingTotalCCAmount);
+        ccAgentPaymentBill.setNetTotal(payingBalanceAcodingToCCBalabce);
+        ccAgentPaymentBill.setTotal(payingBalanceAcodingToCCBalabce);
+        ccAgentPaymentBill.setPaidAmount(payingBalanceAcodingToCCBalabce);
 
         ccAgentPaymentBill.setPaymentMethod(paymentMethod);
         String billNumber = billNumberGenerator.departmentBillNumberGeneratorYearly(sessionController.getDepartment(), BillTypeAtomic.CC_AGENT_PAYMENT);
@@ -592,6 +595,106 @@ public class CollectingCentrePaymentController implements Serializable {
         return (value == null || value.trim().isEmpty()) ? defaultValue : value;
     }
 
+    public void cancelPaymentBill() {
+        if (ccPaymentSettlingStarted) {
+            JsfUtil.addErrorMessage("Already Started Process");
+            return;
+        }
+
+        ccPaymentSettlingStarted = true;
+
+        if (currentPaymentBill == null) {
+            ccPaymentSettlingStarted = false;
+            JsfUtil.addErrorMessage("Payment Bill is Missing");
+            return;
+        }
+        if (currentPaymentBill.isCancelled()) {
+            ccPaymentSettlingStarted = false;
+            JsfUtil.addErrorMessage("Bill already cancelled.");
+            return;
+        }
+
+        if (comment == null || comment.isEmpty()) {
+            ccPaymentSettlingStarted = false;
+            JsfUtil.addErrorMessage("Comment is Missing");
+            return;
+        }
+        Bill cancelBill = saveCancelBill();
+
+        createPayment(cancelBill, cancelBill.getPaymentMethod());
+
+        for (BillItem bi : currentPaymentBill.getBillItems()) {
+
+            BillItem reversal = new BillItem();
+            reversal.setReferenceBill(bi.getReferenceBill());
+            reversal.setBill(cancelBill);
+            reversal.setCreatedAt(new Date());
+            reversal.setCreater(sessionController.getLoggedUser());
+            reversal.setDiscount(0.0);
+            reversal.setGrossValue(0 - bi.getGrossValue());
+            reversal.setNetValue(0 - bi.getNetValue());
+            billItemFacade.create(reversal);
+
+            Bill ref = bi.getReferenceBill();
+            ref.setPaid(false);
+            ref.setPaidAmount(0.0);
+            ref.setPaidAt(null);
+            ref.setPaidBill(null);
+            billFacade.edit(ref);
+            
+        }
+
+//        // Update CC Balance
+        agentAndCcApplicationController.updateCcBalance(
+                cancelBill.getToInstitution(),
+                0.0,
+                cancelBill.getNetTotal(),
+                0.0,
+                cancelBill.getNetTotal(),
+                HistoryType.RepaymentToCollectingCentreCancel,
+                cancelBill);
+
+        ccPaymentSettlingStarted = false;
+        setCurrentPaymentBill(cancelBill);
+        printPriview = true;
+
+    }
+
+    public Bill saveCancelBill() {
+        Bill ccAgentPaymentCancelBill = new Bill();
+
+        ccAgentPaymentCancelBill.copy(currentPaymentBill);
+        ccAgentPaymentCancelBill.copyValue(currentPaymentBill);
+        ccAgentPaymentCancelBill.setCreater(sessionController.getLoggedUser());
+        ccAgentPaymentCancelBill.setCreatedAt(new Date());
+        ccAgentPaymentCancelBill.setBillType(BillType.CollectingCentreAgentPaymentCancel);
+        ccAgentPaymentCancelBill.setFromInstitution(currentPaymentBill.getToInstitution());
+        ccAgentPaymentCancelBill.setBillDate(new Date());
+        ccAgentPaymentCancelBill.setBillTime(new Date());
+        ccAgentPaymentCancelBill.setComments(comment);
+
+        ccAgentPaymentCancelBill.setBillTypeAtomic(BillTypeAtomic.CC_AGENT_PAYMENT_CANCELLATION);
+
+        String billNumber = billNumberGenerator.departmentBillNumberGeneratorYearly(sessionController.getDepartment(), BillTypeAtomic.CC_AGENT_PAYMENT_CANCELLATION);
+
+        ccAgentPaymentCancelBill.setDeptId(billNumber);
+        ccAgentPaymentCancelBill.setInsId(billNumber);
+
+        ccAgentPaymentCancelBill.invertValueOfThisBill();
+
+        if (ccAgentPaymentCancelBill.getId() == null) {
+            billFacade.create(ccAgentPaymentCancelBill);
+        } else {
+            billFacade.edit(ccAgentPaymentCancelBill);
+        }
+
+        currentPaymentBill.setCancelled(true);
+        currentPaymentBill.setCancelledBill(ccAgentPaymentCancelBill);
+        billFacade.edit(currentPaymentBill);
+
+        return ccAgentPaymentCancelBill;
+    }
+
     // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Getter & Setter">
     public Date getFromDate() {
@@ -744,5 +847,12 @@ public class CollectingCentrePaymentController implements Serializable {
         this.billNumber = billNumber;
     }
 
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 // </editor-fold>
 }

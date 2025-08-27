@@ -1,0 +1,431 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/resources/template/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:bi="http://xmlns.jcp.org/jsf/composite/bill"
+                xmlns:ph="http://xmlns.jcp.org/jsf/composite/pharmacy">
+
+    <ui:define name="content">
+        <h:form>
+            <p:panel
+                class="w-100 m-1"
+                rendered="#{!grnController.printPreview}">
+                <f:facet name="header">
+                    <h:outputLabel value="GRN Receive with Save/Approve" />
+                    <p:commandButton
+                        ajax="false"
+                        action="/pharmacy/pharmacy_purchase_order_list_for_recieve?faces-redirect=true"
+                        actionListener="#{searchController.makeListNull()}"
+                        class="ui-button-warning"
+                        icon="fa fa-arrow-left"
+                        style="float: right; margin-right: 0.5em;"
+                        value="Back to PO List">
+                    </p:commandButton>
+                    <p:commandButton
+                        value="Approve"
+                        action="#{grnController.requestFinalizeWithSaveApprove}"
+                        class="ui-button-success"
+                        icon="fas fa-check"
+                        ajax="false"
+                        style="float: right; margin-right: 0.5em;">
+                    </p:commandButton>
+                    <p:commandButton
+                        value="Save"
+                        action="#{grnController.requestWithSaveApprove}"
+                        class="ui-button-info"
+                        icon="pi pi-save"
+                        ajax="false"
+                        style="float: right; margin-right: 0.5em;">
+                    </p:commandButton>
+                </f:facet>
+
+
+                <h:panelGrid columns="9" class="w-100 my-2" id="grn">
+                    <h:outputLabel value="Supplier"/>
+                    <p:autoComplete 
+                        converter="deal" 
+                        value="#{grnController.fromInstitution}"
+                        completeMethod="#{dealerController.completeDealor}" 
+                        forceSelection="true"
+                        var="vt" 
+                        itemLabel="#{vt.name}" 
+                        itemValue="#{vt}" />
+                    <h:outputLabel value="GRN Institution"/>
+                    <p:autoComplete                         
+                        value="#{grnController.referenceInstitution}"
+                        completeMethod="#{institutionController.completeCompany}" 
+                        forceSelection="true"
+                        var="vt" 
+                        itemLabel="#{vt.name}" 
+                        itemValue="#{vt}" />
+
+                    <h:outputLabel value="Payment Method"/>
+                    <p:selectOneMenu   id="cmbPs" value="#{grnController.currentGrnBillPre.paymentMethod}">    
+                        <f:selectItem itemLabel="SelectPayment method"/>
+                        <f:selectItems value="#{enumController.paymentMethodsForPo}"/>
+                        <p:ajax process="@this" update="grn" event="change"/>
+                        <p:ajax process="@this" update="duration" event="itemSelect" />
+                    </p:selectOneMenu>
+                    <h:panelGroup rendered="#{grnController.currentGrnBillPre.paymentMethod eq 'Credit'}" id="duration" >
+                        <div class="d-flex" >
+                            <div class="ui-inputgroup mx-1 my-1">
+                                <p:inputText  
+                                    value="#{grnController.currentGrnBillPre.creditDuration}"
+                                    style="width: 10em;">
+                                </p:inputText>
+                                <div class="ui-inputgroup-addon">Days</div>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+                    <h:outputLabel value="Comment"/>
+                    <p:inputText autocomplete="off" 
+                                 onfocus="this.select()"
+                                 styleClass="numericTxt" 
+                                 value="#{grnController.currentGrnBillPre.comments}" style="width:75%" />  
+
+                </h:panelGrid>
+                <p:dataTable 
+                    var="bi" 
+                    styleClass="noBorder" 
+                    rowKey="#{bi.searialNo}"
+                    selection="#{grnController.selectedBillItems}"
+                    value="#{grnController.billItems}" 
+                    class="w-100" scrollable="true"
+                    scrollHeight="350px"
+                    id="itemList" 
+                    selectionMode="multiple"
+                    editable="true">  
+                    <p:focus id="focusPrate" for="pRate"></p:focus>
+
+                    <f:facet name="header">  
+                        <h:outputLabel  value="Ordered Bill Item"/>   
+                        <p:commandButton 
+                            ajax="false" 
+                            value="Remove All"
+                            style="float: right;"
+                            class="ui-button-danger"
+                            icon="fas fa-trash"
+                            action="#{grnController.removeSelected()}"/>
+                    </f:facet>  
+                    <p:column 
+                        width="2em"
+                        selectionBox="true"
+                        styleClass="#{grnController.isProfitAboveThreshold(bi) ? 'ui-messages-fatal' : ''}"/>
+                    <p:column 
+                        headerText="Item Name" 
+                        width="20em"
+                        styleClass="#{grnController.isProfitAboveThreshold(bi) ? 'ui-messages-fatal' : ''}" > 
+                        <h:outputText id="item" value="#{bi.item.name}" ></h:outputText>
+                    </p:column>  
+                    <p:column 
+                        headerText="Code" 
+                        width="4em"
+                        rendered="#{configOptionApplicationController.getBooleanValueByKey('Medicine Identification Codes Used', true)}"
+                        styleClass="#{grnController.isProfitAboveThreshold(bi) ? 'ui-messages-fatal' : ''}"> 
+                        <h:outputText id="code" value="#{bi.item.code}" >                                   
+                        </h:outputText>
+                    </p:column> 
+                    <p:column 
+                        width="6em"
+                        headerText="Ordered Qty" 
+                        styleClass="text-end #{grnController.isProfitAboveThreshold(bi) ? 'ui-messages-fatal' : ''}">  
+                        <p:inputText
+                            readonly="true"
+                            class="w-100 text-end text-secondary"
+                            value="#{bi.referanceBillItem.pharmaceuticalBillItem.qtyInUnit}"/>
+                    </p:column>  
+
+                    <p:column 
+                        width="6em"
+                        headerText="Receiving Qty" 
+                        styleClass="text-end #{grnController.isProfitAboveThreshold(bi) ? 'ui-messages-fatal' : ''}" >
+                        <p:inputText 
+                            onfocus="this.select();"
+                            autocomplete="off" 
+                            class="text-end text-primary w-100"
+                            value="#{bi.tmpQty}" >
+                            <f:ajax event="blur" execute="@this pRate rRate doeDateOnlyShort batch ordQty" render="@this :#{p:resolveFirstComponentWithId('tot',view).clientId} total ordQty doeDateOnlyShort profMargin batch pRate rRate" listener="#{grnController.checkQty(bi)}"></f:ajax>
+                        </p:inputText>
+                    </p:column>  
+
+                    <p:column 
+                        width="6em"
+                        headerText="Ordered Free Qty" 
+                        styleClass="text-end #{grnController.isProfitAboveThreshold(bi) ? 'ui-messages-fatal' : ''}">  
+                        <p:inputText 
+                            readonly="true"
+                            class="w-100 text-end text-secondary"
+                            value="#{bi.referanceBillItem.pharmaceuticalBillItem.freeQtyInUnit}"/>
+                    </p:column>  
+
+                    <p:column
+                        width="6em"
+                        headerText="Recieved Free Qty"
+                        styleClass="text-end #{grnController.isProfitAboveThreshold(bi) ? 'ui-messages-fatal' : ''}">   
+                        <p:inputText
+                            autocomplete="off" 
+                            class="text-end text-primary w-100"
+                            onfocus="this.select();"
+                            value="#{bi.tmpFreeQty}" 
+                            id="freeQty" >
+                            <f:ajax event="blur" execute="@this pRate freeQty rRate ordQty doeDateOnlyShort batch" render="@this :#{p:resolveFirstComponentWithId('tot',view).clientId} total freeQty doeDateOnlyShort profMargin batch pRate rRate" listener="#{grnController.checkQty(bi)}"></f:ajax>
+                        </p:inputText>
+                    </p:column> 
+
+                    <p:column
+                        width="8em"
+                        headerText="Purchase Rate"
+                        styleClass="text-end #{grnController.isProfitAboveThreshold(bi) ? 'ui-messages-fatal' : ''}">  
+                        <p:inputText 
+                            disabled="#{!configOptionApplicationController.getBooleanValueByKey('GRN Purchase Rate is Editable', true)}"
+                            autocomplete="off" 
+                            class="text-end text-primary w-100"
+                            value="#{bi.pharmaceuticalBillItem.purchaseRate}" 
+                            id="pRate" 
+                            onfocus="this.select()">
+                            <f:ajax event="blur" execute="pRate rRate ordQty freeQty doeDateOnlyShort batch" render="@this :#{p:resolveFirstComponentWithId('tot',view).clientId} total doeDateOnlyShort profMargin batch pRate rRate" listener="#{grnController.onEdit(bi)}"></f:ajax>
+                        </p:inputText>
+                    </p:column>  
+                    <p:column 
+                        headerText="Sale Price" 
+                        width="8em"
+                        styleClass="text-end #{grnController.isProfitAboveThreshold(bi) ? 'ui-messages-fatal' : ''}"> 
+                        <p:inputText 
+                            autocomplete="off"
+                            class="text-end text-primary w-100"
+                            value="#{bi.pharmaceuticalBillItem.retailRate}"  id="rRate" onfocus="this.select()">
+                            <f:ajax event="blur" execute="pRate rRate ordQty freeQty doeDateOnlyShort batch" render="@this :#{p:resolveFirstComponentWithId('tot',view).clientId} total doeDateOnlyShort profMargin batch pRate rRate" listener="#{grnController.onEdit(bi)}"></f:ajax>
+                            <f:convertNumber pattern="#,##0.00" />
+                        </p:inputText>
+                    </p:column>  
+
+                    <p:column 
+                        headerText="Total" 
+                        width="8em"
+                        styleClass="text-end #{grnController.isProfitAboveThreshold(bi) ? 'ui-messages-fatal' : ''}">  
+                        <h:panelGroup id="total">
+                            <p:inputText 
+                                readonly="true"
+                                class="text-end text-secondary w-100"
+                                value="#{bi.pharmaceuticalBillItem.purchaseRate*bi.pharmaceuticalBillItem.qty}" >
+                                <f:convertNumber pattern="#,##0.00" />
+                            </p:inputText>
+                        </h:panelGroup>
+                    </p:column>  
+
+                    <p:column 
+                        headerText="Date Of Expiry" 
+                        width="8em"
+                        styleClass="#{grnController.isProfitAboveThreshold(bi) ? 'ui-messages-fatal' : ''}" >  
+                        <p:calendar  value="#{bi.pharmaceuticalBillItem.doe}" 
+                                     id="doeDateOnlyShort"
+                                     class="text-center text-primary w-100"
+                                     inputStyleClass="w-100"
+                                     navigator="true" 
+                                     pattern="#{sessionController.applicationPreference.shortDateFormat}"    > 
+                            <f:ajax event="dateSelect" execute="doeDateOnlyShort batch" render="itemList" listener="#{grnController.setBatch(bi)}"></f:ajax>
+                        </p:calendar>
+                    </p:column> 
+
+                    <p:column 
+                        width="9em"
+                        headerText="Batch No"
+                        styleClass="#{grnController.isProfitAboveThreshold(bi) ? 'ui-messages-fatal' : ''}">  
+                        <p:inputText 
+                            class="w-100"
+                            autocomplete="off" value="#{bi.pharmaceuticalBillItem.stringValue}" id="batch">  
+                        </p:inputText>
+                    </p:column>  
+                    <p:column 
+                        headerText="Comments"
+                        width="5em"
+                        styleClass="#{grnController.isProfitAboveThreshold(bi) ? 'ui-messages-fatal' : ''}">  
+                        <p:inputText 
+                            class="w-100"
+                            autocomplete="off"
+                            value="#{bi.descreption}" id="comments">  
+                        </p:inputText>
+                    </p:column>  
+                    <p:column
+                        width="4em"
+                        headerText="Profit %" 
+                        styleClass="text-end #{grnController.isProfitAboveThreshold(bi) ? 'ui-messages-fatal' : ''}">                    
+                        <p:inputText
+                            id="profMargin"
+                            readonly="true"
+                            class="text-end w-100 text-secondary"
+                            value="#{grnController.getProfitMargin(bi)}" >
+                            <f:convertNumber pattern="0.0"></f:convertNumber>
+                        </p:inputText>
+                    </p:column>
+
+                    <p:column 
+                        headerText="Actions"
+                        width="7em"
+                        styleClass="text-center #{grnController.isProfitAboveThreshold(bi) ? 'ui-messages-fatal' : ''}">
+                        <p:commandButton 
+                            process=":#{p:resolveFirstComponentWithId('itemList',view).clientId}"
+                            update=":#{p:resolveFirstComponentWithId('tot',view).clientId} :#{p:resolveFirstComponentWithId('itemList',view).clientId} "
+                            icon="fas fa-plus"
+                            class="ui-button-warning mx-1"
+                            action="#{grnController.duplicateItem(bi)}"/>
+                        <p:commandButton 
+                            ajax="false"
+                            icon="fas fa-trash"
+                            class="ui-button-danger"
+                            action="#{grnController.removeItem(bi)}"/>
+
+                    </p:column>
+
+                </p:dataTable>  
+                <p:panel>
+                    <p:panelGrid columns="3" style="min-width: 100%" id="tot">
+
+                        <p:panelGrid columns="2">
+                            <p:outputLabel value="Invoice No "/>
+                            <p:inputText autocomplete="off" value="#{grnController.currentGrnBillPre.invoiceNumber}" />
+                            <p:outputLabel value="Invoice Date"/>
+                            <p:calendar  value="#{grnController.currentGrnBillPre.invoiceDate}"   navigator="true" pattern="#{sessionController.applicationPreference.shortDateFormat}" /> 
+                        </p:panelGrid>                    
+
+                        <p:panelGrid columns="2" >
+                            <p:outputLabel value="Gross Total"/>
+                            <p:outputLabel id="gro"  value="#{0-grnController.total}">
+                                <f:convertNumber pattern="#,##0.00" />
+                            </p:outputLabel>
+                            <p:outputLabel value="Discount"/>
+                            <p:inputText
+                                autocomplete="off" 
+                                id="dis" 
+                                class="text-end w-100"
+                                onfocus="this.select();"
+                                value="#{grnController.discount}" >
+                                <p:ajax process="@this" update="net ins" event="keyup"
+                                        listener="#{grnController.netDiscount()}"/>
+                            </p:inputText>
+                            <p:outputLabel value="Net Total"/>
+                            <p:outputLabel id="net"  value="#{0-grnController.netTotal}" >
+                                <f:convertNumber pattern="#,##0.00" />
+                            </p:outputLabel>
+                        </p:panelGrid>
+
+                        <p:panelGrid columns="2" id="ins">
+                            <p:outputLabel value="Invoice Total"/>
+                            <p:inputText 
+                                id="insv"  
+                                onfocus="this.select();"
+                                value="#{grnController.insTotal}" >
+                                <f:convertNumber pattern="#,##0.00" />
+                                <p:ajax 
+                                    process="@this" 
+                                    update="diff" 
+                                    event="keyup"
+                                    listener="#{grnController.calDifference()}"/>
+                            </p:inputText>
+                            <p:outputLabel value="Difference"/>
+                            <p:inputText autocomplete="off" disabled="true" id="diff" value="#{grnController.difference}"
+                                         style="background-color: #e6e6e6;color: #{grnController.difference > 0 ? 'green' : (grnController.difference == 0 ? 'inherit' : 'red')}">
+                                <f:convertNumber pattern="#,##0.00" />
+                            </p:inputText>
+
+
+                        </p:panelGrid>
+
+                    </p:panelGrid>
+                </p:panel>
+
+                <p:panel header="Bill Expenses" >
+                    <h:panelGrid id="billExpenseGrid" columns="4" style="min-width: 100%;">
+                        <h:outputLabel value="Select Expense"/>
+                        <h:outputLabel value="Value"/>
+                        <h:outputLabel value="Description"/>
+                        <h:outputLabel ></h:outputLabel>
+                        <p:autoComplete 
+                            id="acExpense"   
+                            value="#{grnController.currentExpense.item}" 
+                            forceSelection="true"
+                            completeMethod="#{itemController.completeExpenseItem}" 
+                            var="ex" 
+                            itemLabel="#{ex.name}" 
+                            itemValue="#{ex}" 
+                            inputStyleClass="w-100" 
+                            class="w-75">
+                        </p:autoComplete>
+                        <p:inputText 
+                            autocomplete="off" 
+                            id="txtExpense"
+                            onfocus="this.select()"
+                            styleClass="numericTxt" 
+                            value="#{grnController.currentExpense.rate}" 
+                            style="width:50%" />  
+                        <p:inputText maxlength="250" value="#{grnController.currentExpense.descreption}" style="width:75%" ></p:inputText>
+                        <p:commandButton 
+                            id="btnAddExpense" 
+                            value="Add Expense" 
+                            icon="fas fa-plus"
+                            class="ui-button-warning mx-2"
+                            action="#{grnController.addExpense()}"
+                            ajax = "false"
+                            process="billExpenseGrid btnAddExpense @this" 
+                            update=" billExpenseGrid @all"/>
+                    </h:panelGrid>
+                    <p:dataTable id="tblExpenses" value="#{grnController.billExpenses}" var="be" class="mt-2"
+                                 emptyMessage="No Bill Expenses" >
+                        <p:column headerText="Expense" >
+                            <h:outputLabel value="#{be.item.name}" ></h:outputLabel>
+                        </p:column>
+                        <p:column headerText="Value" >
+                            <h:outputLabel value="#{be.netValue}" >
+                                <f:convertNumber pattern="#,##0.00" ></f:convertNumber>
+                            </h:outputLabel>
+                        </p:column>
+                        <p:column headerText="Description" >
+                            <h:outputLabel value="#{be.descreption}" ></h:outputLabel>
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+
+
+
+            </p:panel>
+
+            <p:panel rendered="#{grnController.printPreview}" style="border: none;">
+                <f:facet name="header">
+                    <div class="d-flex justify-content-between">
+                        <h:outputLabel value="GRN Preview " class="mt-2"/>
+                        <div class="d-flex gap-2">
+                            <p:commandButton
+                                ajax="false"
+                                action="/pharmacy/pharmacy_purchase_order_list_for_recieve?faces-redirect=true"
+                                actionListener="#{searchController.makeListNull()}"
+                                class="ui-button-warning"
+                                icon="fa fa-arrow-left"
+                                value="Back to PO List">
+                            </p:commandButton>
+                            <p:commandButton 
+                                value="Print" 
+                                ajax="false" 
+                                icon="fa fa-print"
+                                class="ui-button-info"
+                                action="#" >
+                                <p:printer target="gpBillPreview" ></p:printer>
+                            </p:commandButton>
+                        </div>
+                    </div>
+                </f:facet>
+
+                <h:panelGroup  id="gpBillPreview"   style="border: none; width: 214mm;" >
+
+                    <h:panelGroup rendered="#{sessionController.loggedPreference.grnBillDetailed eq false}" class="d-flex justify-content-center">
+                        <ph:grn bill="#{grnController.currentGrnBillPre}"/>
+                    </h:panelGroup>
+
+                </h:panelGroup>
+            </p:panel>
+        </h:form>
+    </ui:define>  
+
+</ui:composition>
